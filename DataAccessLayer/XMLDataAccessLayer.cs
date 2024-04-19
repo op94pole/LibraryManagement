@@ -12,7 +12,7 @@ public class XMLDataAccessLayer
     private readonly string reservationsFilePath = "C:\\Users\\luca9\\Documents\\Visual Studio 2022\\Coding\\LibraryManagment\\DataAccessLayer\\bin\\Debug\\net8.0\\reservations.xml";
        
     // Funzione per verificare i dati di login
-    public bool VerifyLogin(string username, string password)
+    public User VerifyLogin(string username, string password)
     {
         XmlSerializer serializer = new XmlSerializer(typeof(List<User>));
         using FileStream xmlStream = new FileStream(usersFilePath, FileMode.Open);
@@ -20,10 +20,7 @@ public class XMLDataAccessLayer
         List<User> users = (List<User>)serializer.Deserialize(xmlStream);
         User currentUser = users.Where(u => u.Username == username && u.Password == password).FirstOrDefault();
 
-        if (currentUser != null)
-            return true;
-        else
-            return false;
+        return currentUser;
     }
         
     // Funzione per recuperare tutti i libri

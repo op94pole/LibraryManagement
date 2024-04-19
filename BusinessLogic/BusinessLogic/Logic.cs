@@ -17,6 +17,8 @@ namespace BusinessLogic
         public void Login()
         {
             bool success = default;
+            bool validInput = default;
+            User currentUser;
 
             do
             {
@@ -26,16 +28,14 @@ namespace BusinessLogic
                 Console.Write("Inserisci la password: ");
                 string? password = Console.ReadLine();
 
-                if (layer.VerifyLogin(username, password))
+                currentUser = layer.VerifyLogin(username, password);
+
+                if (currentUser != null)
                 {
                     success = true;
-                    
-                    Menu();
                 }
                 else
                 {
-                    bool validInput = default;
-
                     do
                     {
                         Console.WriteLine("Username o password errati! Premi y per riprovare o n per uscire dall'applicazione");
@@ -57,17 +57,27 @@ namespace BusinessLogic
                                 success = true;
                                 validInput = false;
                                 break;
-                        }                    
+                        }
                     } while (!validInput);
                 }
             } while (!success);
+
+            if (currentUser.Role == "Administrator") // currentUser was null
+                AdminMenu();
+            if (currentUser.Role == "User")
+                UserMenu();
         }
 
-        public void Menu()
+        public void AdminMenu()
         {
-            Console.WriteLine("Menu");
+            Console.WriteLine("Admin menu");
         }
-        
+
+        public void UserMenu()
+        {
+            Console.WriteLine("User menu");
+        }
+
         //public void AdmninMenu()
         //{
         //    Console.WriteLine("1. Ricerca un libro");
