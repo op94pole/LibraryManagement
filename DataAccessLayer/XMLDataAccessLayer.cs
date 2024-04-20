@@ -9,7 +9,8 @@ using Model;
 
 public class XMLDataAccessLayer
 {
-    private readonly string usersFilePath = "C:\\Users\\luca9\\Documents\\Visual Studio 2022\\Coding\\LibraryManagment\\DataAccessLayer\\bin\\Debug\\net8.0\\users.xml";
+    private readonly string usersFilePath = "C:\\Users\\luca9\\Downloads\\Database.xml";
+    //private readonly string usersFilePath = "C:\\Users\\luca9\\Documents\\Visual Studio 2022\\Coding\\LibraryManagment\\DataAccessLayer\\bin\\Debug\\net8.0\\users.xml";
     private readonly string booksFilePath = "C:\\Users\\luca9\\Documents\\Visual Studio 2022\\Coding\\LibraryManagment\\DataAccessLayer\\bin\\Debug\\net8.0\\books.xml";
     private readonly string reservationsFilePath = "C:\\Users\\luca9\\Documents\\Visual Studio 2022\\Coding\\LibraryManagment\\DataAccessLayer\\bin\\Debug\\net8.0\\reservations.xml";
 
@@ -126,7 +127,6 @@ public class XMLDataAccessLayer
                             break;
 
                         case "":
-                            currentUser.Username = reader.Value;
                             break;
 
                         default:

@@ -10,13 +10,15 @@ namespace LibraryManagement
         {
             
             Logic logic = new Logic();
-            //XMLDataAccessLayer xml = new XMLDataAccessLayer();
+            XMLDataAccessLayer xml = new XMLDataAccessLayer();
 
             Console.WriteLine("Ti diamo il benvenuto in LIBRARY MANAGMENT APP CONSOLE");
             Console.WriteLine();
             Console.WriteLine("Premi un tasto qualsiasi per procedere con il login...");
             Console.ReadKey();
             Console.Clear();
+
+            xml.DeserializedUsers();
 
             logic.Login();
 
