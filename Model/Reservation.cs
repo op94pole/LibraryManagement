@@ -13,12 +13,15 @@ namespace Model
         {
             ReservationId = _reservationId++;            
             StartDate = DateTime.Now;
+            EndDate = DateTime.Now.AddDays(30);
         }
 
         private static int _reservationId = 1;
         public int ReservationId { get; set; }
-        public int UserId { get; set; }
-        public int BookId { get; set; }
+        // public int UserId { get; set; }
+        public User UserId { get; set; }
+        // public int BookId { get; set; }
+        public Book BookId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
     }

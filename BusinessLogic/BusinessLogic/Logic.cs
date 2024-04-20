@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Security;
-using System.Reflection.Metadata;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Model;
+﻿using Model;
 
 namespace BusinessLogic
 {
@@ -24,11 +15,13 @@ namespace BusinessLogic
             {
                 Console.Clear();
                 Console.Write("Inserisci lo username: ");
-                string? username = Console.ReadLine();
+                var username = Console.ReadLine();
                 Console.Write("Inserisci la password: ");
-                string? password = Console.ReadLine();
+                var password = Console.ReadLine();
 
-                currentUser = layer.VerifyLogin(username, password);
+                //currentUser = layer.VerifyLogin(username, password);
+
+                currentUser = layer.GetUser(username, password);
 
                 if (currentUser != null)
                 {
@@ -62,9 +55,9 @@ namespace BusinessLogic
                 }
             } while (!success);
 
-            if (currentUser.Role == "Administrator") // currentUser was null
+            if (currentUser.Role == User.UserRole.Administrator) // currentUser was null
                 AdminMenu();
-            if (currentUser.Role == "User")
+            if (currentUser.Role == User.UserRole.User)
                 UserMenu();
         }
 

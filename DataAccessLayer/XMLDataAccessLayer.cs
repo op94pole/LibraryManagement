@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using Model;
@@ -10,19 +12,21 @@ public class XMLDataAccessLayer
     private readonly string usersFilePath = "C:\\Users\\luca9\\Documents\\Visual Studio 2022\\Coding\\LibraryManagment\\DataAccessLayer\\bin\\Debug\\net8.0\\users.xml";
     private readonly string booksFilePath = "C:\\Users\\luca9\\Documents\\Visual Studio 2022\\Coding\\LibraryManagment\\DataAccessLayer\\bin\\Debug\\net8.0\\books.xml";
     private readonly string reservationsFilePath = "C:\\Users\\luca9\\Documents\\Visual Studio 2022\\Coding\\LibraryManagment\\DataAccessLayer\\bin\\Debug\\net8.0\\reservations.xml";
-       
+
     // Funzione per verificare i dati di login
     public User VerifyLogin(string username, string password)
     {
         XmlSerializer serializer = new XmlSerializer(typeof(List<User>));
         using FileStream xmlStream = new FileStream(usersFilePath, FileMode.Open);
 
+
         List<User> users = (List<User>)serializer.Deserialize(xmlStream);
+
         User currentUser = users.Where(u => u.Username == username && u.Password == password).FirstOrDefault();
 
         return currentUser;
     }
-        
+
     // Funzione per recuperare tutti i libri
     public List<Book> GetBooks()
     {
@@ -99,7 +103,46 @@ public class XMLDataAccessLayer
     {
         List<Reservation> reservations = GetReservations();
         Reservation existingReservation = reservations.Where(r => r.ReservationId == reservationId).SingleOrDefault();
-       
+
         reservations.Remove(existingReservation);
+    }
+
+    public List<User> DeserializedUsers()
+    {
+        List<User> users = new List<User>();
+        User currentUser = null;
+
+        using (XmlReader reader = XmlReader.Create(usersFilePath))
+        {
+            while (reader.Read())
+            {
+                if (reader.IsStartElement())
+                {
+                    switch (reader.Name)
+                    {
+                        case "User":
+                            currentUser = new User();
+                            users.Add(currentUser);
+                            break;
+
+                        case "":
+                            currentUser.Username = reader.Value;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        return users;
+    }
+
+    public User GetUser(string username, string password)
+    {
+        var user = new User();
+
+        return user;
     }
 }
