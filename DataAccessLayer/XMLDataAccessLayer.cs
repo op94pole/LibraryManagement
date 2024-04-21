@@ -60,9 +60,9 @@ public class XMLDataAccessLayer
         throw new InvalidOperationException($"Root element '{rootElementName}' not found."); //
     }
 
-    public bool CheckCredentials(string username, string password)
+    public bool CheckCredentials(string username, string password, out User currentUser)
     {
-        User currentUser = Deserialize<List<User>>("Users").Where(u => u.Username == username && u.Password == password).SingleOrDefault();
+        currentUser = Deserialize<List<User>>("Users").Where(u => u.Username == username && u.Password == password).SingleOrDefault();
 
         if (currentUser != null)
             return true;

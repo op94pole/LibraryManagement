@@ -6,96 +6,28 @@ namespace BusinessLogic
     {
         private XMLDataAccessLayer xmlDAL = new();
 
-        public bool DoLogin(string username, string password)
+        public bool DoLogin(string username, string password, out User currentUser)
         {
-            if (xmlDAL.CheckCredentials(username, password))
+            if (xmlDAL.CheckCredentials(username, password, out currentUser))
             {
-                Console.WriteLine("Benvenuto");
                 return true;
             }
             else
             {
-                Console.WriteLine("Errore");
                 return false;
             }
         }
-       
-        //public void Login()
-        //{
-        //    bool success = default;
-        //    bool validInput = default;
-        //    User currentUser;
 
-        //    do
-        //    {
-        //        Console.Clear();
-        //        Console.Write("Inserisci lo username: ");
-        //        var username = Console.ReadLine();
-        //        Console.Write("Inserisci la password: ");
-        //        var password = Console.ReadLine();
+        public string AdminMenu()
+        {
+            return "1. Ricerca un libro\r\n2. Modifica un libro\r\n3. Inserisci un nuovo libro\r\n4. Cancella un libro\r\n5. Chiedi un prestito\r\n" +
+                "6. Restituisci un libro\r\n7. Visualizza lo storico delle prenotazioni\r\n8. Esci";
+        }
 
-        //        if (string.IsNullOrEmpty(username) && string.IsNullOrEmpty(password))
-        //        {
-        //            Console.WriteLine("Input non valido. Vuoi riprovare? y/n");
-        //            var input = Console.ReadLine();
-
-        //            switch (input)
-        //            {
-        //                case "y":
-        //                    continue;
-
-        //                default:
-        //                    success = false;
-        //                    break;
-        //            }
-
-        //            continue;
-        //        }
-
-        //        //currentUser = layer.GetUser(username, password);
-
-        //        //if (currentUser != null)
-        //        //{
-        //        //    success = true;
-        //        //}
-        //        else
-        //        {
-        //            do
-        //            {
-        //                Console.WriteLine("Username o password errati! Premi y per riprovare o n per uscire dall'applicazione");
-        //                string? input = Console.ReadLine();
-
-        //                switch (input)
-        //                {
-        //                    case "y":
-        //                        success = false;
-        //                        validInput = true;
-        //                        break;
-        //                    case "n":
-        //                        success = true;
-        //                        validInput = true;
-        //                        break;
-        //                    default:
-        //                        Console.WriteLine("Input non valido!");
-        //                        Console.Clear();
-        //                        success = true;
-        //                        validInput = false;
-        //                        break;
-        //                }
-        //            } while (!validInput);
-        //        }
-        //    } while (!success);
-
-        //    //if (currentUser.Role == User.UserRole.Administrator) // currentUser was null
-        //    //    AdminMenu();
-        //    //if (currentUser.Role == User.UserRole.User)
-        //    //    UserMenu();
-        //}
-
-        //public void AdminMenu()
-        //{
-        //    Console.WriteLine("Admin menu");
-        //}
+        public string UserMenu()
+        {
+            return "1. Ricerca un libro\r\n2. Chiedi un prestito\r\n3. Restituisci un libro\r\n4. Visualizza lo storico delle prenotazioni\r\n5. Esci";
+        }
 
         //public void UserMenu()
         //{
