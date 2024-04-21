@@ -10,7 +10,9 @@ namespace LibraryManagement
         static void Main()
         {
             var xmlDAL = new XMLDataAccessLayer();
-            var logic = new Logic();
+            var businessLogic = new Logic();
+
+            User currentUser;
             
 
             Console.WriteLine("Ti diamo il benvenuto in LIBRARY MANAGMENT APP CONSOLE");
@@ -24,17 +26,27 @@ namespace LibraryManagement
             Console.Write("Inserisci la password: ");
             string password = Console.ReadLine();
 
-            if (logic.Login(username, password))
-            {
-                Console.Clear();
-                Console.WriteLine("Ok");
-            }
+            businessLogic.DoLogin(username, password);
+
+            //if (businessLogic.DoLogin(username, password))
+            //{
+            //    if (xmlDAL.CurrentUser.Role == "Administrator")
+            //    {
+            //        Console.WriteLine("Welcom admin");
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("Welcome user");
+            //    }
+            //}       
+
 
             //var newBook = new Book { Title = "Il piccolo principe", AuthorName = "Antoine", AuthorSurname = "de Saint-Exupéry",
             //    Publisher = "Feltrinelli", Quantity = 2 };
 
             //xmlDAL.Serialize(newBook, "Books");
             //The process cannot access the file 'C:\Users\luca9\Downloads\Database.xml' because it is being used by another process.'
+
 
             Console.ReadKey();  
         }

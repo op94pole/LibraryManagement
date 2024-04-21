@@ -6,14 +6,18 @@ namespace BusinessLogic
     {
         private XMLDataAccessLayer xmlDAL = new();
 
-        public bool Login(string username, string password)
+        public bool DoLogin(string username, string password)
         {
-            User currentUser = xmlDAL.GetUsers().Where(u => u.Username == username && u.Password == password).FirstOrDefault(); //
-
-            if (currentUser == null)
-                return false;
-            else
+            if (xmlDAL.CheckCredentials(username, password))
+            {
+                Console.WriteLine("Benvenuto");
                 return true;
+            }
+            else
+            {
+                Console.WriteLine("Errore");
+                return false;
+            }
         }
        
         //public void Login()
