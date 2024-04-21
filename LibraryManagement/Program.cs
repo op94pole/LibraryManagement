@@ -1,6 +1,7 @@
 ﻿using BusinessLogic;
 using System.Xml.Serialization;
 using Model;
+using System.Net.NetworkInformation;
 
 namespace LibraryManagement
 {
@@ -8,9 +9,9 @@ namespace LibraryManagement
     {
         static void Main()
         {
+            var xmlDAL = new XMLDataAccessLayer();
+            var logic = new Logic();
             
-            Logic logic = new Logic();
-            XMLDataAccessLayer xml = new XMLDataAccessLayer();
 
             Console.WriteLine("Ti diamo il benvenuto in LIBRARY MANAGMENT APP CONSOLE");
             Console.WriteLine();
@@ -18,10 +19,22 @@ namespace LibraryManagement
             Console.ReadKey();
             Console.Clear();
 
-            xml.DeserializedUsers();
+            Console.Write("Inserisci lo username: ");
+            string username = Console.ReadLine();
+            Console.Write("Inserisci la password: ");
+            string password = Console.ReadLine();
 
-            logic.Login();
+            if (logic.Login(username, password))
+            {
+                Console.Clear();
+                Console.WriteLine("Ok");
+            }
 
+            //var newBook = new Book { Title = "Il piccolo principe", AuthorName = "Antoine", AuthorSurname = "de Saint-Exupéry",
+            //    Publisher = "Feltrinelli", Quantity = 2 };
+
+            //xmlDAL.Serialize(newBook, "Books");
+            //The process cannot access the file 'C:\Users\luca9\Downloads\Database.xml' because it is being used by another process.'
 
             Console.ReadKey();  
         }

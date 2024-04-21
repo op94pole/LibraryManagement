@@ -4,72 +4,99 @@ namespace BusinessLogic
 {
     public class Logic
     {
-        private XMLDataAccessLayer layer = new XMLDataAccessLayer();
-        public void Login()
+        private XMLDataAccessLayer xmlDAL = new();
+
+        public bool Login(string username, string password)
         {
-            bool success = default;
-            bool validInput = default;
-            User currentUser;
+            User currentUser = xmlDAL.GetUsers().Where(u => u.Username == username && u.Password == password).FirstOrDefault(); //
 
-            do
-            {
-                Console.Clear();
-                Console.Write("Inserisci lo username: ");
-                var username = Console.ReadLine();
-                Console.Write("Inserisci la password: ");
-                var password = Console.ReadLine();
-
-                //currentUser = layer.VerifyLogin(username, password);
-
-                currentUser = layer.GetUser(username, password);
-
-                if (currentUser != null)
-                {
-                    success = true;
-                }
-                else
-                {
-                    do
-                    {
-                        Console.WriteLine("Username o password errati! Premi y per riprovare o n per uscire dall'applicazione");
-                        string? input = Console.ReadLine();
-
-                        switch (input)
-                        {
-                            case "y":
-                                success = false;
-                                validInput = true;
-                                break;
-                            case "n":
-                                success = true;
-                                validInput = true;
-                                break;
-                            default:
-                                Console.WriteLine("Input non valido!");
-                                Console.Clear();
-                                success = true;
-                                validInput = false;
-                                break;
-                        }
-                    } while (!validInput);
-                }
-            } while (!success);
-
-            if (currentUser.Role == User.UserRole.Administrator) // currentUser was null
-                AdminMenu();
-            if (currentUser.Role == User.UserRole.User)
-                UserMenu();
+            if (currentUser == null)
+                return false;
+            else
+                return true;
         }
+       
+        //public void Login()
+        //{
+        //    bool success = default;
+        //    bool validInput = default;
+        //    User currentUser;
 
-        public void AdminMenu()
-        {
-            Console.WriteLine("Admin menu");
-        }
+        //    do
+        //    {
+        //        Console.Clear();
+        //        Console.Write("Inserisci lo username: ");
+        //        var username = Console.ReadLine();
+        //        Console.Write("Inserisci la password: ");
+        //        var password = Console.ReadLine();
 
-        public void UserMenu()
-        {
-            Console.WriteLine("User menu");
-        }
+        //        if (string.IsNullOrEmpty(username) && string.IsNullOrEmpty(password))
+        //        {
+        //            Console.WriteLine("Input non valido. Vuoi riprovare? y/n");
+        //            var input = Console.ReadLine();
+
+        //            switch (input)
+        //            {
+        //                case "y":
+        //                    continue;
+
+        //                default:
+        //                    success = false;
+        //                    break;
+        //            }
+
+        //            continue;
+        //        }
+
+        //        //currentUser = layer.GetUser(username, password);
+
+        //        //if (currentUser != null)
+        //        //{
+        //        //    success = true;
+        //        //}
+        //        else
+        //        {
+        //            do
+        //            {
+        //                Console.WriteLine("Username o password errati! Premi y per riprovare o n per uscire dall'applicazione");
+        //                string? input = Console.ReadLine();
+
+        //                switch (input)
+        //                {
+        //                    case "y":
+        //                        success = false;
+        //                        validInput = true;
+        //                        break;
+        //                    case "n":
+        //                        success = true;
+        //                        validInput = true;
+        //                        break;
+        //                    default:
+        //                        Console.WriteLine("Input non valido!");
+        //                        Console.Clear();
+        //                        success = true;
+        //                        validInput = false;
+        //                        break;
+        //                }
+        //            } while (!validInput);
+        //        }
+        //    } while (!success);
+
+        //    //if (currentUser.Role == User.UserRole.Administrator) // currentUser was null
+        //    //    AdminMenu();
+        //    //if (currentUser.Role == User.UserRole.User)
+        //    //    UserMenu();
+        //}
+
+        //public void AdminMenu()
+        //{
+        //    Console.WriteLine("Admin menu");
+        //}
+
+        //public void UserMenu()
+        //{
+        //    Console.WriteLine("User menu");
+        //}
 
         //public void AdmninMenu()
         //{
