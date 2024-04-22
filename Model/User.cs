@@ -16,15 +16,12 @@ namespace Model
         [XmlAttribute]
         public string Password { get; set; }        
         [XmlAttribute]
-        public string Role { get; set; }
+        public UserRole Role { get; set; }
 
-        //[XmlAttribute]
-        //public UserRole Role { get; set; }
-
-        //public enum UserRole
-        //{
-        //    User,
-        //    Admin
-        //};
+        public enum UserRole
+        {
+            User,
+            Admin
+        };
     }
 }

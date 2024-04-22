@@ -10,22 +10,13 @@ namespace Model
 {
     public class Book
     {
-        //public Book(string title, string authorName, string authorSurname, string publishingHouse, int quantity)
-        //{
-        //    BookId = _bookId++;
-        //    Title = title;
-        //    AuthorName = authorName;
-        //    AuthorSurname = authorSurname;
-        //    PublishingHouse = publishingHouse;
-        //    Quantity = quantity;
-        //}
+        private static int _bookId = 1;
 
         public Book()
         {
-            BookId = _bookId++;            
+            BookId = _bookId++;
         }
-
-        private static int _bookId = 1;         
+                
         public int BookId { get; set; }       
         public string Title { get; set; }      
         public string AuthorName { get; set; }        

@@ -10,33 +10,28 @@ namespace Model
 {
     public class Reservation
     {
+        private static int _reservationId = 1;
+
         public Reservation()
         {
             ReservationId = _reservationId++;
-            StartDate = DateTime.Now.ToString();
-            EndDate = DateTime.Now.AddDays(30).ToString();
+            StartDate = DateTime.Now;
+            EndDate = DateTime.Now.AddDays(30);
         }
-
-        private static int _reservationId = 1;
 
         [XmlAttribute]
         public int ReservationId { get; set; }
-        [XmlAttribute]
-        public int UserId { get; set; }
-        [XmlAttribute]
-        public int BookId { get; set; }
-        [XmlAttribute]
-        public string StartDate { get; set; }
-        [XmlAttribute]
-        public string EndDate { get; set; }       
-
         //[XmlAttribute]
-        //public User UserId { get; set; }
+        //public int UserId { get; set; }
         //[XmlAttribute]
-        //public Book BookId { get; set; }
-        //[XmlAttribute]
-        //public DateTime StartDate { get; set; }
-        //[XmlAttribute]
-        //public DateTime EndDate { get; set; }
+        //public int BookId { get; set; }
+        [XmlAttribute]
+        public User UserId { get; set; }
+        [XmlAttribute]
+        public Book BookId { get; set; }
+        [XmlAttribute]
+        public DateTime StartDate { get; set; }
+        [XmlAttribute]
+        public DateTime EndDate { get; set; }
     }
 }

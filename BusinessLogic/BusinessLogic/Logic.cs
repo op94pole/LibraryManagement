@@ -1,4 +1,5 @@
 ﻿using Model;
+using System.Reflection;
 
 namespace BusinessLogic
 {
@@ -29,84 +30,18 @@ namespace BusinessLogic
             return "1. Ricerca un libro\r\n2. Chiedi un prestito\r\n3. Restituisci un libro\r\n4. Visualizza lo storico delle prenotazioni\r\n5. Esci";
         }
 
-        //public void UserMenu()
-        //{
-        //    Console.WriteLine("User menu");
-        //}
+        public void CreateBook(string title, string authorName, string authorSurname, string publisher, int quantity)
+        {
+            Book newBook = new()
+            {
+                Title = title,
+                AuthorName = authorName,
+                AuthorSurname = authorSurname,
+                Publisher = publisher,
+                Quantity = quantity
+            };
 
-        //public void AdmninMenu()
-        //{
-        //    Console.WriteLine("1. Ricerca un libro");
-        //    Console.WriteLine("2. Modifica un libro");
-        //    Console.WriteLine("3. Inserisci un nuovo libro");
-        //    Console.WriteLine("4. Cancella un libro");
-        //    Console.WriteLine("5. Chiedi un prestito");
-        //    Console.WriteLine("6. Restituisci un libro");
-        //    Console.WriteLine("7. Visualizza lo storico delle prenotazioni");
-        //    Console.WriteLine("6. Esci");
-
-        //    string? input = Console.ReadLine();
-
-        //    switch (input)
-        //    {
-        //        case "1":
-        //            //
-        //            break;
-        //        case "2":
-        //            //
-        //            break;
-        //        case "3":
-        //            CreateBook();
-        //            break;
-        //        case "4":
-        //            //
-        //            break;
-        //        case "5":
-        //            //
-        //            break;
-        //        case "6":
-        //            //
-        //            break;
-        //        case "7":
-        //            //
-        //            break;
-        //        default:
-        //            break;
-
-        //    }
-        //}
-
-        //public void UserMenu()
-        //{
-        //    Console.WriteLine("1. Ricerca un libro");
-        //    Console.WriteLine("2. Chiedi un prestito");
-        //    Console.WriteLine("3. Restituisci un libro");
-        //    Console.WriteLine("4. Visualizza lo storico delle prenotazioni");
-        //    Console.WriteLine("5. Esci");
-
-        //    string? input = Console.ReadLine();
-
-        //    switch (input)
-        //    {
-        //        case "1":
-        //            //
-        //            break;
-        //        case "2":
-        //            //
-        //            break;
-        //        case "3":
-        //            //
-        //            break;
-        //        case "4":
-        //            //
-        //            break;
-        //        case "5":
-        //            //
-        //            break;
-        //        default:
-        //            //
-        //            break;
-        //    }
-        //}        
+            xmlDAL.AddBook(newBook);
+        }        
     }
 }

@@ -1,45 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
+using System.Reflection.PortableExecutable;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using Model;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class XMLDataAccessLayer
 {
-    private static readonly string databasePath = "C:\\Users\\luca9\\Downloads\\Database.xml";
-    //private static readonly string databaseReadPath = "C:\\Users\\luca9\\source\\repos\\op94pole\\LibraryManagement\\Model\\samples\\Database.xml";
-    //private static readonly string databaseWritePath = "C:\\Users\\luca9\\Downloads\\Database.xml";
+    private static readonly string databasePath = "C:\\Users\\luca9\\Downloads\\Database.xml";   
 
-    public /*static*/ void Serialize<T>(T obj, string rootElementName)
+    public static void Serialize<T>(T obj, string rootElementName)
     {
-        using (XmlWriter writer = XmlWriter.Create(databasePath, new XmlWriterSettings { Indent = true }))
+        XmlDocument xmlDocument = new XmlDocument();
+        xmlDocument.Load(databasePath);
+
+        XmlNode parentNode = xmlDocument.DocumentElement;
+        XmlNode targetNode = null;
+
+        foreach (XmlNode childNode in parentNode.ChildNodes)
         {
-            using (XmlReader reader = XmlReader.Create(databasePath))
+            if (childNode.Name == rootElementName)
             {
-                while (reader.Read())
-                {
-                    if (reader.NodeType == XmlNodeType.Element && reader.Name == rootElementName)
-                    {
-                        //Posizioniamoci subito dopo l'ultimo child node dell'elemento radice
-                        reader.MoveToContent();
-                        reader.Read();
-
-                        while (reader.NodeType != XmlNodeType.EndElement)
-                        {
-                            reader.Read();
-                        }
-
-                        //Serializziamo l'oggetto utilizzando un XmlWriter posizionato subito dopo l'ultimo child node
-                        XmlSerializer serializer = new XmlSerializer(typeof(T));
-                        serializer.Serialize(writer, obj);
-                        break;
-                    }
-                }
+                targetNode = childNode;
+                break;
             }
         }
+
+        if (targetNode == null)
+        {
+            targetNode = xmlDocument.CreateElement(rootElementName);
+            parentNode.AppendChild(targetNode);
+        }
+
+        XmlSerializer serializer = new XmlSerializer(typeof(T));
+        XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+        namespaces.Add("", ""); 
+
+        using (MemoryStream stream = new MemoryStream())
+        {
+            using (XmlWriter xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true }))
+            {
+                serializer.Serialize(xmlWriter, obj, namespaces);
+            }
+
+            stream.Position = 0;
+
+            XmlDocument serializedXml = new XmlDocument();
+            serializedXml.Load(stream);
+
+            XmlNode serializedRoot = serializedXml.DocumentElement;
+            XmlNode importedNode = xmlDocument.ImportNode(serializedRoot, true);
+            targetNode.AppendChild(importedNode);
+        }
+
+        xmlDocument.Save(databasePath);
     }
 
     public static T Deserialize<T>(string rootElementName)
@@ -60,7 +80,7 @@ public class XMLDataAccessLayer
         throw new InvalidOperationException($"Root element '{rootElementName}' not found."); //
     }
 
-    public bool CheckCredentials(string username, string password, out User currentUser)
+    public bool CheckCredentials(string username, string password, out User currentUser) //
     {
         currentUser = Deserialize<List<User>>("Users").Where(u => u.Username == username && u.Password == password).SingleOrDefault();
 
@@ -72,13 +92,16 @@ public class XMLDataAccessLayer
 
     public List<Book> GetAvaiableBooks()
     {
-        var books = (List<Book>)Deserialize<List<Book>>("Books").Where(b => b.Quantity > 0); //
+        var books = (List<Book>)Deserialize<List<Book>>("Books"); //.Where(b => b.Quantity > numero reservations...);
         return books;
     }
 
     //public List<Book> SearchBook() { }
 
-    //public void AddBook() { }
+    public void AddBook(Book newBook)
+    {        
+        Serialize<Book>(newBook, "Books");
+    }
 
     //public void UpdateBook() { }
 
