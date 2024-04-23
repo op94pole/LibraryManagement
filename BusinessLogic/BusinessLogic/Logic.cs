@@ -38,23 +38,34 @@ namespace BusinessLogic
             {
                 foreach (Book currentBook in books)
                 {
-                    if (currentBook != newBook)
-                        equal = false;
-                    else
-                        equal = true;
+                    if (currentBook.Title.ToLowerInvariant() == newBook.Title.ToLowerInvariant() &&
+                            currentBook.AuthorName.ToLowerInvariant() == newBook.AuthorName.ToLowerInvariant() &&
+                        currentBook.AuthorSurname.ToLowerInvariant() == newBook.AuthorSurname.ToLowerInvariant() &&
+                            currentBook.Publisher.ToLowerInvariant() == newBook.Publisher.ToLowerInvariant())
+                    {
+                        newBook.Quantity += currentBook.Quantity;
+
+                        List<Book> booksList = xmlDAL.Deserialize<List<Book>>("Books");
+
+                        booksList.Add(newBook);
+
+                        xmlDAL.Serialize(booksList, "Books");
+                    }
+
+                    //if (currentBook != newBook)
+                    //    equal = false;
+                    //else
+                    //    equal = true;
                 }
 
-                if (!equal)
-                    xmlDAL.Serialize<Book>(newBook, "Books");
-                else
-                    throw new Exception("Libro già presente a sistema!");
+                xmlDAL.Serialize<Book>(newBook, "Books");
             }
         }
 
         public void BookSearch(string search)
         {
             int counter = 0;
-            string response = "Nessuna corrispondenza trovata!";
+            string response = "Nessuna corrispondenza trovata!"; //
             List<Book> books = xmlDAL.Deserialize<List<Book>>("Books");
 
             foreach (Book currentBook in books)
@@ -75,18 +86,5 @@ namespace BusinessLogic
         {
             return xmlDAL.Deserialize<List<Reservation>>("Reservations");
         }
-
-        public string AdminMenu() //
-        {
-            return "1. Ricerca un libro\r\n2. Modifica un libro\r\n3. Inserisci un nuovo libro\r\n4. Cancella un libro\r\n5. Chiedi un prestito\r\n" +
-                "6. Restituisci un libro\r\n7. Visualizza lo storico delle prenotazioni\r\n8. Esci";
-        }
-
-        public string UserMenu() //
-        {
-            return "1. Ricerca un libro\r\n2. Chiedi un prestito\r\n3. Restituisci un libro\r\n4. Visualizza lo storico delle prenotazioni\r\n5. Esci";
-        }
-
-
     }
 }
