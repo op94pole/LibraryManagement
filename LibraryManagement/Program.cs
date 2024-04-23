@@ -53,7 +53,7 @@ namespace LibraryManagement
                     {
                         if (currentUser.Role == User.UserRole.Admin)
                         {
-                            AdminMenu:
+                        //AdminMenu:
                             Console.Clear();
                             Console.WriteLine($"Benvenuto {currentUser.Username}! ({currentUser.Role})");
                             Console.WriteLine();
@@ -90,7 +90,7 @@ namespace LibraryManagement
 
                         break;
                     }
-                } 
+                }
             } while (!success);
 
             Console.WriteLine();
@@ -102,6 +102,11 @@ namespace LibraryManagement
                 switch (choice)
                 {
                     case "1":
+                        Console.Clear();
+                        Console.Write("Cerca: ");
+                        var search = Console.ReadLine();
+
+                        businessLogic.BookSearch(search);
                         break;
 
                     case "2":
@@ -113,9 +118,9 @@ namespace LibraryManagement
                         string authorSurname;
                         string publisher;
                         int quantity;
-                        
+
                         do
-                        {                            
+                        {
                             Console.Clear(); //
                             Console.Write("Inserisci il titolo: ");
                             title = Console.ReadLine();
@@ -144,14 +149,22 @@ namespace LibraryManagement
                                         success = true;
                                         break;
                                 }
-
-                                //if (!success)
-                                //    continue;
                             }
                             else
-                                businessLogic.CreateBook(title, authorName, authorSurname, publisher, quantity);
-                        } while (!success);                        
-                        
+                            {
+                                try
+                                {
+                                    businessLogic.CreateBook(title, authorName, authorSurname, publisher, quantity);
+                                    success = false;
+                                    continue;
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.Message);
+                                }
+                            }
+                        } while (!success);
+
                         break;
 
                     case "4":

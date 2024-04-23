@@ -16,12 +16,18 @@ namespace Model
         {
             BookId = _bookId++;
         }
-                
-        public int BookId { get; set; }       
-        public string Title { get; set; }      
-        public string AuthorName { get; set; }        
-        public string AuthorSurname { get; set; }        
-        public string Publisher { get; set; }       
+
+        [XmlAttribute]
+        public int BookId { get; set; }
+        [XmlAttribute]
+        public string Title { get; set; }
+        [XmlAttribute]
+        public string AuthorName { get; set; }
+        [XmlAttribute]
+        public string AuthorSurname { get; set; }
+        [XmlAttribute]
+        public string Publisher { get; set; }
+        [XmlAttribute]
         public int Quantity { get; set; }
     }
 }

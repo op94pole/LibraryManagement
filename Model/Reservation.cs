@@ -19,19 +19,19 @@ namespace Model
             EndDate = DateTime.Now.AddDays(30);
         }
 
-        [XmlAttribute]
+        [XmlElement]
         public int ReservationId { get; set; }
         //[XmlAttribute]
         //public int UserId { get; set; }
         //[XmlAttribute]
         //public int BookId { get; set; }
-        [XmlAttribute]
+        [XmlElement]
         public User UserId { get; set; }
-        [XmlAttribute]
+        [XmlElement]
         public Book BookId { get; set; }
-        [XmlAttribute]
+        [XmlElement]
         public DateTime StartDate { get; set; }
-        [XmlAttribute]
+        [XmlElement]
         public DateTime EndDate { get; set; }
     }
 }
