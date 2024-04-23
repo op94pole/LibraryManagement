@@ -29,5 +29,7 @@ namespace Model
         public string Publisher { get; set; }
         [XmlAttribute]
         public int Quantity { get; set; }
+        [XmlElement("Book")]
+        public List<Book> BooksList { get; set; }
     }
 }

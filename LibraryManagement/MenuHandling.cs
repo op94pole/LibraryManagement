@@ -57,7 +57,6 @@ namespace LibraryManagement
                 Console.Write("Input non valido! ");
 
                 Retry();
-
                 return false;                
             }
             else
@@ -87,11 +86,8 @@ namespace LibraryManagement
                     Console.Write("Username o password errati! ");
                                         
                     if (Retry())
-                    {
                         Login();
-                    }
                 }
-
                 return true;
             }
         }
@@ -168,8 +164,9 @@ namespace LibraryManagement
                     string authorName;
                     string authorSurname;
                     string publisher;
-                    int quantity;
+                    int quantity = 0;
                     bool success = default;
+                    bool parsed = default;
 
                     do
                     {
@@ -184,8 +181,28 @@ namespace LibraryManagement
                         authorSurname = Console.ReadLine();
                         Console.Write("Inserisci la casa editrice: ");
                         publisher = Console.ReadLine();
-                        Console.Write("Inserisci la quantità: ");
-                        Int32.TryParse(Console.ReadLine(), out quantity);
+                        //Console.Write("Inserisci la quantità: ");
+                        //Int32.TryParse(Console.ReadLine(), out quantity);
+
+                        do
+                        {
+                            Console.Write("Inserisci la quantità: ");
+
+                            //try
+                            //{
+                                Int32.TryParse(Console.ReadLine(), out quantity);
+
+                                if (quantity == 0)
+                                {
+                                    Console.WriteLine();
+                                    Console.WriteLine("Input non valido! ");
+                                }                                
+                            //}
+                            //catch (FormatException)
+                            //{
+                            //    Console.WriteLine("Input non valido! ");
+                            //}
+                        } while (quantity == 0);
 
                         if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(authorName) || string.IsNullOrEmpty(authorSurname) ||
                             string.IsNullOrEmpty(publisher) || string.IsNullOrEmpty(title))
@@ -197,7 +214,7 @@ namespace LibraryManagement
                         }
                         else
                         {
-                            businessLogic.CreateBook(title, authorName, authorSurname, publisher, quantity);
+                            businessLogic.AddBook(title, authorName, authorSurname, publisher, quantity);
                             success = false;
 
                             Console.WriteLine();

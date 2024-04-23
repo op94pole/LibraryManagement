@@ -8,6 +8,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using DataAccessLayer;
 using Model;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -15,7 +16,7 @@ public class XMLDataAccessLayer
 {
     private static readonly string databasePath = "C:\\Users\\luca9\\Downloads\\Database.xml";   
 
-    public void Serialize<T>(T obj, string rootElementName)
+    public void Serialize<T>(T obj, string rootElementName) //
     {
         XmlDocument xmlDocument = new XmlDocument();
         xmlDocument.Load(databasePath);
@@ -37,10 +38,12 @@ public class XMLDataAccessLayer
             targetNode = xmlDocument.CreateElement(rootElementName);
             parentNode.AppendChild(targetNode);
         }
+        else
+            targetNode.RemoveAll();
 
         XmlSerializer serializer = new XmlSerializer(typeof(T));
-        XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
-        namespaces.Add("", ""); 
+        XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces(); //
+        namespaces.Add("", ""); //
 
         using (MemoryStream stream = new MemoryStream())
         {
@@ -56,6 +59,7 @@ public class XMLDataAccessLayer
 
             XmlNode serializedRoot = serializedXml.DocumentElement;
             XmlNode importedNode = xmlDocument.ImportNode(serializedRoot, true);
+
             targetNode.AppendChild(importedNode);
         }
 
@@ -77,29 +81,6 @@ public class XMLDataAccessLayer
             }
         }
 
-        throw new InvalidOperationException($"Root element '{rootElementName}' not found."); //
+        throw new InvalidOperationException($"Root element '{rootElementName}' not found."); // unhandled 
     }
-
-    public List<Book> GetAvaiableBooks() //
-    {
-        var books = (List<Book>)Deserialize<List<Book>>("Books"); //.Where(b => b.Quantity > numero reservations...);
-        return books;
-    }
-
-    //public List<Book> SearchBook() { } //    
-
-    //public void UpdateBook() { } //
-
-    //public void DeleteBook() { } //
-
-    public List<Reservation> GetReservations() //
-    {
-        var reservations = Deserialize<List<Reservation>>("Reservations");
-        return reservations;
-    }
-
-    //public void CreateReservation() { }
-
-    //public void DeleteReservation() { }
-
 }
