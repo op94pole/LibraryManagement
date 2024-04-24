@@ -1,5 +1,6 @@
 ﻿using Model;
 using System.ComponentModel.Design;
+using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
@@ -25,37 +26,59 @@ namespace BusinessLogic
 
         public void AddBook(string title, string authorName, string authorSurname, string publisher, int quantity)
         {
-            var newBook = new Book();
-            newBook.Title = title;
-            newBook.AuthorName = authorName;
-            newBook.AuthorSurname = authorSurname;
-            newBook.Publisher = publisher;
-            newBook.Quantity = quantity;
-
             modelBook.BooksList = xmlDAL.Deserialize<List<Book>>("Books");
 
-            if (modelBook.BooksList.Count > 0)
-            {
-                foreach (Book currentBook in modelBook.BooksList)
-                {
-                    if (currentBook.Title.ToLowerInvariant() == newBook.Title.ToLowerInvariant() &&
-                            currentBook.AuthorName.ToLowerInvariant() == newBook.AuthorName.ToLowerInvariant() &&
-                            currentBook.AuthorSurname.ToLowerInvariant() == newBook.AuthorSurname.ToLowerInvariant() &&
-                            currentBook.Publisher.ToLowerInvariant() == newBook.Publisher.ToLowerInvariant())
-                        currentBook.Quantity += newBook.Quantity;
-                }
+            bool bookFound = false;
 
-                xmlDAL.Serialize<List<Book>>(modelBook.BooksList, "Books");
+            foreach (Book currentBook in modelBook.BooksList)
+            {
+                if (currentBook.Title.ToLowerInvariant() == title.ToLowerInvariant() &&
+                    currentBook.AuthorName.ToLowerInvariant() == authorName.ToLowerInvariant() &&
+                    currentBook.AuthorSurname.ToLowerInvariant() == authorSurname.ToLowerInvariant() &&
+                    currentBook.Publisher.ToLowerInvariant() == publisher.ToLowerInvariant())
+                {
+                    currentBook.Quantity += quantity;
+                    bookFound = true;
+                    break;
+                }
             }
 
-            modelBook.BooksList.Add(newBook);
+            if (!bookFound)
+            {
+                var newBook = new Book();
+                newBook.Title = title;
+                newBook.AuthorName = authorName;
+                newBook.AuthorSurname = authorSurname;
+                newBook.Publisher = publisher;
+                newBook.Quantity = quantity;
+
+                modelBook.BooksList.Add(newBook);
+            }
+
             xmlDAL.Serialize<List<Book>>(modelBook.BooksList, "Books");
         }
 
-        public void SearchBook(string search)
+        public void ModifyBook(int choiceNumber, string title, string authorName, string authorSurname, string publisher)
+        {
+            modelBook.BooksList = xmlDAL.Deserialize<List<Book>>("Books");
+
+            modelBook.BooksList[choiceNumber - 1].Title = title;
+            modelBook.BooksList[choiceNumber - 1].AuthorName = authorName;
+            modelBook.BooksList[choiceNumber - 1].AuthorSurname = authorSurname;
+            modelBook.BooksList[choiceNumber - 1].Publisher = publisher;
+
+            xmlDAL.Serialize<List<Book>>(modelBook.BooksList, "Books");
+        }
+
+        public void DeleteBook(int choiceNumber)
+        {
+
+        }
+
+        public List<Book> SearchBook(string search)
         {
             int counter = 0;
-            string response = ""; 
+            string response = "";
 
             modelBook.BooksList = xmlDAL.Deserialize<List<Book>>("Books");
 
@@ -74,6 +97,18 @@ namespace BusinessLogic
 
             if (response == "")
                 Console.WriteLine("Nessuna corrispondenza trovata");
+
+            return modelBook.BooksList;
+        }
+        
+        public void CreateReservation() //
+        {
+
+        }
+
+        public void ReturnBook() //
+        {
+
         }
 
         public List<Reservation> GetReservation() //

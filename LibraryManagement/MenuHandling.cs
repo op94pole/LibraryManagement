@@ -2,6 +2,7 @@
 using Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace LibraryManagement
 {
     public class MenuHandling
     {
+        XMLDataAccessLayer xmlDAL = new();
+
         public void LibraryManagementLoad()
         {
             Console.WriteLine("Ti diamo il benvenuto in LIBRARY MANAGMENT CONSOLE APP");
@@ -46,18 +49,18 @@ namespace LibraryManagement
         }
 
         public bool CredentialsCheck(string username, string password)
-        {            
+        {
             string input;
             var businessLogic = new Logic();
             User currentUser;
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) 
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 Console.Clear();
                 Console.Write("Input non valido! ");
 
                 Retry(); //
-                return false;                
+                return false;
             }
             else
             {
@@ -78,13 +81,13 @@ namespace LibraryManagement
                         Console.WriteLine();
 
                         GetUserMenu();
-                    }                         
+                    }
                 }
                 else
                 {
                     Console.Clear();
                     Console.Write("Username o password errati! ");
-                                        
+
                     if (Retry())
                         Login();
                 }
@@ -106,7 +109,7 @@ namespace LibraryManagement
                 default:
                     Console.Clear();
                     LibraryManagementLoad();
-                    return false;                    
+                    return false;
             }
         }
 
@@ -121,13 +124,13 @@ namespace LibraryManagement
             Console.WriteLine("6. Restituisci un libro");
             Console.WriteLine("7. Visualizza lo storico delle prenotazioni");
             Console.WriteLine("8. Esci");
-            Console.WriteLine();                 
+            Console.WriteLine();
 
             AdminMenuChoice();
         }
 
         public void AdminMenuChoice()
-        {            
+        {
             var businessLogic = new Logic();
             string input;
 
@@ -152,25 +155,46 @@ namespace LibraryManagement
 
                         input = Console.ReadLine();
                     } while (input == "y");
-                    
+
                     break;
 
                 case "2":
-                    //Console.Clear();
-                    //Console.WriteLine("2. Modifica un libro");
-                    //Console.WriteLine();
-                    //Console.Write("Cerca: ");
-                    //var searchBook = Console.ReadLine();
+                    Console.Clear();
+                    Console.WriteLine("2. Modifica un libro");
+                    Console.WriteLine();
 
-                    //businessLogic.SearchBook(searchBook);
+                    int counter = 0;
+                    List<Book> list = xmlDAL.Deserialize<List<Book>>("Books");
 
+                    foreach (Book currentBook in list)
+                    {
+                        counter++;
+                        Console.WriteLine($"{counter}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
+                                $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}");
+                    }          
+                   
+                    Console.WriteLine();
+                    Console.WriteLine("Seleziona un libro da modificare e premi Invio.");
+                    Int32.TryParse(Console.ReadLine(), out int bookChoice);
+                   
+                    Console.Clear();
+                    Console.Write("Inserisci il titolo: ");
+                    var title = Console.ReadLine();
+                    Console.Write("Inserisci il nome dell'autore: ");
+                    var authorName = Console.ReadLine();
+                    Console.Write("Inserisci il cognome dell'autore: ");
+                    var authorSurname = Console.ReadLine();
+                    Console.Write("Inserisci la casa editrice: ");
+                    var publisher = Console.ReadLine();
+
+                    businessLogic.ModifyBook(bookChoice, title, authorName, authorSurname, publisher);
                     break;
 
                 case "3":
-                    string title;
-                    string authorName;
-                    string authorSurname;
-                    string publisher;
+                    string _title;
+                    string _authorName;
+                    string _authorSurname;
+                    string _publisher;
                     int quantity = 0;
                     bool success = default;
                     bool parsed = default;
@@ -188,27 +212,18 @@ namespace LibraryManagement
                         authorSurname = Console.ReadLine();
                         Console.Write("Inserisci la casa editrice: ");
                         publisher = Console.ReadLine();
-                        //Console.Write("Inserisci la quantità: ");
-                        //Int32.TryParse(Console.ReadLine(), out quantity);
 
                         do
                         {
                             Console.Write("Inserisci la quantità: ");
 
-                            //try
-                            //{
-                                Int32.TryParse(Console.ReadLine(), out quantity);
+                            Int32.TryParse(Console.ReadLine(), out quantity);
 
-                                if (quantity == 0)
-                                {
-                                    Console.WriteLine();
-                                    Console.WriteLine("Input non valido! ");
-                                }                                
-                            //}
-                            //catch (FormatException)
-                            //{
-                            //    Console.WriteLine("Input non valido! ");
-                            //}
+                            if (quantity == 0)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("Input non valido! ");
+                            }
                         } while (quantity == 0);
 
                         if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(authorName) || string.IsNullOrEmpty(authorSurname) ||
@@ -233,7 +248,7 @@ namespace LibraryManagement
                                 success = false;
                             else
                                 success = true;
-                            continue;                            
+                            continue;
                         }
                     } while (!success);
 
@@ -259,7 +274,7 @@ namespace LibraryManagement
             GetAdminMenu();
         }
 
-            public void GetUserMenu()
+        public void GetUserMenu()
         {
             Console.WriteLine("1. Ricerca un libro");
             Console.WriteLine("2. Chiedi un prestito");

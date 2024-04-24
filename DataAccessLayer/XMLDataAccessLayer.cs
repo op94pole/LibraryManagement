@@ -54,53 +54,6 @@ public class XMLDataAccessLayer
         }
 
         xmlDocument.Save(databasePath);
-
-        //XmlDocument xmlDocument = new XmlDocument();
-        //xmlDocument.Load(databasePath);
-
-        //XmlNode parentNode = xmlDocument.DocumentElement;
-        //XmlNode targetNode = null;
-
-        //foreach (XmlNode childNode in parentNode.ChildNodes)
-        //{
-        //    if (childNode.Name == rootElementName)
-        //    {
-        //        targetNode = childNode;
-        //        break;
-        //    }
-        //}
-
-        //if (targetNode == null)
-        //{
-        //    targetNode = xmlDocument.CreateElement(rootElementName);
-        //    parentNode.AppendChild(targetNode);
-        //}
-        //else
-        //    targetNode.RemoveAll();
-
-        //XmlSerializer serializer = new XmlSerializer(typeof(T));
-        //XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces(); //
-        //namespaces.Add("", "");
-
-        //using (MemoryStream stream = new MemoryStream())
-        //{
-        //    using (XmlWriter xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true }))
-        //    {
-        //        serializer.Serialize(xmlWriter, obj, namespaces);
-        //    }
-
-        //    stream.Position = 0;
-
-        //    XmlDocument serializedXml = new XmlDocument();
-        //    serializedXml.Load(stream);
-
-        //    XmlNode serializedRoot = serializedXml.DocumentElement;
-        //    XmlNode importedNode = xmlDocument.ImportNode(serializedRoot, true);
-
-        //    targetNode.AppendChild(importedNode);
-        //}
-
-        //xmlDocument.Save(databasePath);
     }
 
     public T Deserialize<T>(string rootElementName)
