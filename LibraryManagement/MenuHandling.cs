@@ -12,6 +12,8 @@ namespace LibraryManagement
     public class MenuHandling
     {
         XMLDataAccessLayer xmlDAL = new();
+        User currentUser = new();
+        bool success1 = default;
 
         public void LibraryManagementLoad()
         {
@@ -27,7 +29,7 @@ namespace LibraryManagement
         public void Login()
         {
             var businessLogic = new Logic();
-            User currentUser;
+            //User currentUser = new();
             bool success = default;
             string input;
 
@@ -52,7 +54,7 @@ namespace LibraryManagement
         {
             string input;
             var businessLogic = new Logic();
-            User currentUser;
+            //User currentUser;
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
@@ -119,8 +121,8 @@ namespace LibraryManagement
             Console.WriteLine("1. Ricerca un libro");
             Console.WriteLine("2. Modifica un libro");
             Console.WriteLine("3. Inserisci un nuovo libro");
-            Console.WriteLine("4. Cancella un libro");
-            Console.WriteLine("5. Chiedi un prestito");
+            Console.WriteLine("4. Elimina un libro");
+            Console.WriteLine("5. Richiedi un prestito");
             Console.WriteLine("6. Restituisci un libro");
             Console.WriteLine("7. Visualizza lo storico delle prenotazioni");
             Console.WriteLine("8. Esci");
@@ -152,42 +154,56 @@ namespace LibraryManagement
 
                         Console.WriteLine();
                         Console.WriteLine("Vuoi fare una nuova ricerca? y/n ");
-
                         input = Console.ReadLine();
                     } while (input == "y");
 
                     break;
 
                 case "2":
-                    Console.Clear();
-                    Console.WriteLine("2. Modifica un libro");
-                    Console.WriteLine();
-
-                    int counter = 0;
-                    List<Book> list = xmlDAL.Deserialize<List<Book>>("Books");
-
-                    foreach (Book currentBook in list)
+                    do
                     {
-                        counter++;
-                        Console.WriteLine($"{counter}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
-                                $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}");
-                    }          
-                   
-                    Console.WriteLine();
-                    Console.WriteLine("Seleziona un libro da modificare e premi Invio.");
-                    Int32.TryParse(Console.ReadLine(), out int bookChoice);
-                   
-                    Console.Clear();
-                    Console.Write("Inserisci il titolo: ");
-                    var title = Console.ReadLine();
-                    Console.Write("Inserisci il nome dell'autore: ");
-                    var authorName = Console.ReadLine();
-                    Console.Write("Inserisci il cognome dell'autore: ");
-                    var authorSurname = Console.ReadLine();
-                    Console.Write("Inserisci la casa editrice: ");
-                    var publisher = Console.ReadLine();
+                        Console.Clear();
+                        Console.WriteLine("2. Modifica un libro");
+                        Console.WriteLine();
 
-                    businessLogic.ModifyBook(bookChoice, title, authorName, authorSurname, publisher);
+                        int counter = 0;
+                        List<Book> list = xmlDAL.Deserialize<List<Book>>("Books");
+
+                        foreach (Book currentBook in list)
+                        {
+                            counter++;
+                            Console.WriteLine($"{counter}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
+                                    $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}");
+                        }
+
+                        Console.WriteLine();
+                        Console.WriteLine("Seleziona un libro da modificare e premi Invio.");
+                        Int32.TryParse(Console.ReadLine(), out int bookChoice);
+
+                        Console.Clear();
+                        Console.Write("Inserisci il titolo: ");
+                        var title = Console.ReadLine();
+                        Console.Write("Inserisci il nome dell'autore: ");
+                        var authorName = Console.ReadLine();
+                        Console.Write("Inserisci il cognome dell'autore: ");
+                        var authorSurname = Console.ReadLine();
+                        Console.Write("Inserisci la casa editrice: ");
+                        var publisher = Console.ReadLine();
+
+                        businessLogic.ModifyBook(bookChoice, title, authorName, authorSurname, publisher);
+
+                        Console.WriteLine();
+                        Console.WriteLine("Modifica apportata con successo!");
+                        Console.WriteLine();
+                        Console.WriteLine("Vuoi modificare un altro libro? y/n");
+                        choice = Console.ReadLine();
+
+                        if (choice == "y")
+                            success1 = false;
+                        else
+                            success1 = true;
+                        continue;
+                    } while (!success1);                    
                     break;
 
                 case "3":
@@ -205,13 +221,13 @@ namespace LibraryManagement
                         Console.WriteLine("2. Inserisci un nuovo libro");
                         Console.WriteLine();
                         Console.Write("Inserisci il titolo: ");
-                        title = Console.ReadLine();
+                        _title = Console.ReadLine();
                         Console.Write("Inserisci il nome dell'autore: ");
-                        authorName = Console.ReadLine();
+                        _authorName = Console.ReadLine();
                         Console.Write("Inserisci il cognome dell'autore: ");
-                        authorSurname = Console.ReadLine();
+                        _authorSurname = Console.ReadLine();
                         Console.Write("Inserisci la casa editrice: ");
-                        publisher = Console.ReadLine();
+                        _publisher = Console.ReadLine();
 
                         do
                         {
@@ -226,8 +242,8 @@ namespace LibraryManagement
                             }
                         } while (quantity == 0);
 
-                        if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(authorName) || string.IsNullOrEmpty(authorSurname) ||
-                            string.IsNullOrEmpty(publisher) || string.IsNullOrEmpty(title))
+                        if (string.IsNullOrEmpty(_title) || string.IsNullOrEmpty(_authorName) || string.IsNullOrEmpty(_authorSurname) ||
+                            string.IsNullOrEmpty(_publisher) || string.IsNullOrEmpty(_title))
                         {
                             Console.WriteLine();
                             Console.Write("I campi non sono stati valorizzati tutti correttamente! ");
@@ -236,12 +252,11 @@ namespace LibraryManagement
                         }
                         else
                         {
-                            businessLogic.AddBook(title, authorName, authorSurname, publisher, quantity);
+                            businessLogic.AddBook(_title, _authorName, _authorSurname, _publisher, quantity);
                             success = false;
 
                             Console.WriteLine();
                             Console.WriteLine("Vuoi inserire un altro libro? y/n");
-
                             choice = Console.ReadLine();
 
                             if (choice == "y")
@@ -251,13 +266,68 @@ namespace LibraryManagement
                             continue;
                         }
                     } while (!success);
-
                     break;
 
                 case "4":
-                    break;
+                    do
+                    {
+                        Console.Clear();
+                        Console.WriteLine("2. Rimuovi un libro");
+                        Console.WriteLine();
+
+                        int counter1 = 0;
+                        List<Book> list1 = xmlDAL.Deserialize<List<Book>>("Books");
+
+                        foreach (Book currentBook in list1)
+                        {
+                            counter1++;
+                            Console.WriteLine($"{counter1}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
+                                    $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}");
+                        }
+
+                        Console.WriteLine();
+                        Console.WriteLine("Seleziona un libro da eliminare e premi Invio.");
+                        Int32.TryParse(Console.ReadLine(), out int choice1);
+
+                        businessLogic.DeleteBook(choice1);
+
+                        Console.Clear();
+                        Console.WriteLine("Libro rimosso correttamente dal sistema.");
+                        Console.WriteLine();
+                        Console.WriteLine("Vuoi rimuovere un altro libro? y/n");
+                        choice = Console.ReadLine();
+
+                        if (choice == "y")
+                            success = false;
+                        else
+                            success = true;
+                    } while (!success);
+                    break; ;
+
+
+                //Console.WriteLine("Premi un tasto qualsiasi per uscire.....");
+                //Console.ReadKey();
 
                 case "5":
+                    Console.Clear();
+                    Console.WriteLine("5. Richiedi un prestito");
+                    Console.WriteLine();
+
+                    int counter2 = 0;
+                    List<Book> list2 = xmlDAL.Deserialize<List<Book>>("Books");
+
+                    foreach (Book currentBook in list2)
+                    {
+                        counter2++;
+                        Console.WriteLine($"{counter2}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
+                                $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}");
+                    }
+
+                    Console.WriteLine();
+                    Console.WriteLine("Seleziona il libro da prenotare e premi Invio.");
+                    Int32.TryParse(Console.ReadLine(), out int choice2);
+
+                    businessLogic.CreateReservation(list2, choice2, currentUser);
                     break;
 
                 case "6":
@@ -287,7 +357,33 @@ namespace LibraryManagement
 
         public void UserMenuChoice()
         {
+            var businessLogic = new Logic();
+            string input;
 
+            Console.WriteLine("Effettua una scelta e premi Invio.");
+            var choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    do
+                    {
+                        Console.Clear();
+                        Console.WriteLine("1. Ricerca un libro");
+                        Console.WriteLine();
+                        Console.Write("Cerca: ");
+                        var search = Console.ReadLine();
+
+                        businessLogic.SearchBook(search);
+
+                        Console.WriteLine();
+                        Console.WriteLine("Vuoi fare una nuova ricerca? y/n ");
+
+                        input = Console.ReadLine();
+                    } while (input == "y");
+
+                    break;
+            }
         }
     }
 }

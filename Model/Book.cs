@@ -14,7 +14,7 @@ namespace Model
 
         public Book()
         {
-            BookId = _bookId++;
+            BookId = _bookId++; // TODO: not working autoincrement => Model/Book
         }
 
         [XmlAttribute]
@@ -29,7 +29,7 @@ namespace Model
         public string Publisher { get; set; }
         [XmlAttribute]
         public int Quantity { get; set; }
-        [XmlArray]
+        [XmlIgnore]
         public List<Book> BooksList { get; set; }
     }
 }

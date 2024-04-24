@@ -14,26 +14,26 @@ namespace Model
 
         public Reservation()
         {
-            ReservationId = _reservationId++;
+            ReservationId = _reservationId++; // TODO: not working autoincrement => Model/Reservation
             StartDate = DateTime.Now;
             EndDate = DateTime.Now.AddDays(30);
         }
 
         [XmlAttribute]
         public int ReservationId { get; set; }
+        [XmlAttribute]
+        public int UserId { get; set; }
+        [XmlAttribute]
+        public int BookId { get; set; }
+        [XmlAttribute]
+        //public User UserId { get; set; }
         //[XmlAttribute]
-        //public int UserId { get; set; }
+        //public Book BookId { get; set; }
         //[XmlAttribute]
-        //public int BookId { get; set; }
-        [XmlAttribute]
-        public User UserId { get; set; }
-        [XmlAttribute]
-        public Book BookId { get; set; }
-        [XmlAttribute]
         public DateTime StartDate { get; set; }
         [XmlAttribute]
         public DateTime EndDate { get; set; }
-        [XmlElement]
+        [XmlIgnore]
         public List<Reservation> ReservationsList { get; set;}
     }
 }

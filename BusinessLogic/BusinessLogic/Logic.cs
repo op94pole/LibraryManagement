@@ -61,18 +61,56 @@ namespace BusinessLogic
         public void ModifyBook(int choiceNumber, string title, string authorName, string authorSurname, string publisher)
         {
             modelBook.BooksList = xmlDAL.Deserialize<List<Book>>("Books");
+            List<Book> attuale = modelBook.BooksList;
 
-            modelBook.BooksList[choiceNumber - 1].Title = title;
-            modelBook.BooksList[choiceNumber - 1].AuthorName = authorName;
-            modelBook.BooksList[choiceNumber - 1].AuthorSurname = authorSurname;
-            modelBook.BooksList[choiceNumber - 1].Publisher = publisher;
+            bool existing = default;
 
-            xmlDAL.Serialize<List<Book>>(modelBook.BooksList, "Books");
+            Book modifiedBook = new()
+            {
+                Title = title,
+                AuthorName = authorName,
+                AuthorSurname = authorSurname,
+                Publisher = publisher
+            };
+
+            foreach (var book in attuale)
+            {
+                if (book.Title == modifiedBook.Title && book.AuthorName == modifiedBook.AuthorName && book.AuthorSurname ==
+                    modifiedBook.AuthorSurname && book.Publisher == modifiedBook.Publisher)
+                    existing = true;
+            }
+
+            if (existing) // throw new exception
+            {
+                Console.WriteLine();
+                Console.WriteLine("Impossibile apportare la modifica! Libro già presente a sistema.");
+                Console.WriteLine();
+                Console.WriteLine("Premi un tasto qualsiasi per proseguire.........................");
+                Console.ReadKey();
+            }
+            else
+            {
+                modelBook.BooksList[choiceNumber - 1].Title = title;
+                modelBook.BooksList[choiceNumber - 1].AuthorName = authorName;
+                modelBook.BooksList[choiceNumber - 1].AuthorSurname = authorSurname;
+                modelBook.BooksList[choiceNumber - 1].Publisher = publisher;
+
+                xmlDAL.Serialize<List<Book>>(modelBook.BooksList, "Books");
+            }
         }
 
         public void DeleteBook(int choiceNumber)
         {
+            modelBook.BooksList = xmlDAL.Deserialize<List<Book>>("Books");
+            List<Book> currentList = modelBook.BooksList;
+            currentList.Remove(currentList[choiceNumber - 1]);
 
+            xmlDAL.Serialize<List<Book>>(currentList, "Books");
+
+            // TODO: gestire la rimozione del libro in base alle prenotazioni attive => BusinessLogic/DeleteBook
+            // è possibile rimuovere un libro dal sistema solo se non ci sono prenotazioni attive => messaggio di errore
+            // per ogni prenotazione con indicate le informazioni dell'utente che ha attiva la prenotazione e fino a quando
+            // con l'eliminazione del libro da sistema va cancellato pure lo storico delle sue prenotazioni
         }
 
         public List<Book> SearchBook(string search)
@@ -97,18 +135,34 @@ namespace BusinessLogic
 
             if (response == "")
                 Console.WriteLine("Nessuna corrispondenza trovata");
-
             return modelBook.BooksList;
-        }
-        
-        public void CreateReservation() //
-        {
 
+            // TODO: gestire la stampa della disponibilità => BusinessLogic/SearchBook
+            // va mostrata anche la data in cui sarà possibile la prenotazione
+        }
+
+        public void CreateReservation(List<Book> filtered, int choice, User currentUser) //
+        {
+            Book reservated = filtered[choice - 1]; // libro da prenotare
+            Reservation newReservation = new Reservation // prenotazione da inserire
+            {
+                UserId = currentUser.UserId, // 
+                BookId = filtered[choice - 1].BookId // 
+            };
+
+            newReservation.ReservationsList = xmlDAL.Deserialize<List<Reservation>>("Reservations");
+            newReservation.ReservationsList.Add(newReservation);
+
+            xmlDAL.Serialize(newReservation.ReservationsList, "Reservations");
+
+            // TODO: gestire la sovrapposizione di richieste
+            // Un libro può essere prenotato solo se non sono attive prenotazioni e se la prenotazione corrente non va a
+            // sovrapporsi ad una prenotazione successiva esistente => messaggio di errore
         }
 
         public void ReturnBook() //
         {
-
+            // messaggio di errore se il libro non risulta prenotato
         }
 
         public List<Reservation> GetReservation() //

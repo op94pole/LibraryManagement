@@ -23,8 +23,6 @@ public class XMLDataAccessLayer
         xmlDocument.Load(databasePath);
 
         XmlNode booksNode = xmlDocument.SelectSingleNode($"/Library/{rootElementName}");
-
-        // Rimuovi tutti i nodi figli dell'elemento <Books>
         booksNode.RemoveAll();
 
         XmlSerializer serializer = new XmlSerializer(typeof(T));
@@ -45,7 +43,6 @@ public class XMLDataAccessLayer
 
             XmlNodeList interestedNode = serializedXml.DocumentElement.ChildNodes;
 
-            // Importa ciascun nodo libro nel documento XML principale
             foreach (XmlNode bookNode in interestedNode)
             {
                 XmlNode importedNode = xmlDocument.ImportNode(bookNode, true);

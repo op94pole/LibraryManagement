@@ -10,9 +10,8 @@ namespace LibraryManagement
         static void Main()
         {
             var menu = new MenuHandling();
-
             menu.LibraryManagementLoad();
-            
+
             Console.ReadKey();
         }
     }
