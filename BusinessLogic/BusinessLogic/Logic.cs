@@ -42,20 +42,17 @@ namespace BusinessLogic
                             currentBook.AuthorName.ToLowerInvariant() == newBook.AuthorName.ToLowerInvariant() &&
                             currentBook.AuthorSurname.ToLowerInvariant() == newBook.AuthorSurname.ToLowerInvariant() &&
                             currentBook.Publisher.ToLowerInvariant() == newBook.Publisher.ToLowerInvariant())
-                        newBook.Quantity += currentBook.Quantity;
+                        currentBook.Quantity += newBook.Quantity;
                 }
-
-                modelBook.BooksList.Add(newBook);
 
                 xmlDAL.Serialize<List<Book>>(modelBook.BooksList, "Books");
             }
 
             modelBook.BooksList.Add(newBook);
-
             xmlDAL.Serialize<List<Book>>(modelBook.BooksList, "Books");
         }
 
-        public void BookSearch(string search)
+        public void SearchBook(string search)
         {
             int counter = 0;
             string response = ""; 
@@ -79,7 +76,7 @@ namespace BusinessLogic
                 Console.WriteLine("Nessuna corrispondenza trovata");
         }
 
-        public List<Reservation> GetReservation()
+        public List<Reservation> GetReservation() //
         {
             modelReservation.ReservationsList = xmlDAL.Deserialize<List<Reservation>>("Reservations");
             return modelReservation.ReservationsList;

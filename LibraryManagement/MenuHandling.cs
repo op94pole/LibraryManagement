@@ -56,7 +56,7 @@ namespace LibraryManagement
                 Console.Clear();
                 Console.Write("Input non valido! ");
 
-                Retry();
+                Retry(); //
                 return false;                
             }
             else
@@ -104,7 +104,6 @@ namespace LibraryManagement
                     return true;
 
                 default:
-
                     Console.Clear();
                     LibraryManagementLoad();
                     return false;                    
@@ -146,7 +145,7 @@ namespace LibraryManagement
                         Console.Write("Cerca: ");
                         var search = Console.ReadLine();
 
-                        businessLogic.BookSearch(search);
+                        businessLogic.SearchBook(search);
 
                         Console.WriteLine();
                         Console.WriteLine("Vuoi fare una nuova ricerca? y/n ");
@@ -157,6 +156,14 @@ namespace LibraryManagement
                     break;
 
                 case "2":
+                    //Console.Clear();
+                    //Console.WriteLine("2. Modifica un libro");
+                    //Console.WriteLine();
+                    //Console.Write("Cerca: ");
+                    //var searchBook = Console.ReadLine();
+
+                    //businessLogic.SearchBook(searchBook);
+
                     break;
 
                 case "3":
@@ -259,6 +266,13 @@ namespace LibraryManagement
             Console.WriteLine("3. Restituisci un libro");
             Console.WriteLine("4. Visualizza lo storico delle prenotazioni");
             Console.WriteLine("5. Esci");
+
+            UserMenuChoice();
+        }
+
+        public void UserMenuChoice()
+        {
+
         }
     }
 }

@@ -10,40 +10,26 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using DataAccessLayer;
 using Model;
+using static System.Reflection.Metadata.BlobBuilder;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class XMLDataAccessLayer
 {
     private static readonly string databasePath = "C:\\Users\\luca9\\Downloads\\Database.xml";   
 
-    public void Serialize<T>(T obj, string rootElementName) //
+    public void Serialize<T>(T obj, string rootElementName) 
     {
         XmlDocument xmlDocument = new XmlDocument();
         xmlDocument.Load(databasePath);
 
-        XmlNode parentNode = xmlDocument.DocumentElement;
-        XmlNode targetNode = null;
+        XmlNode booksNode = xmlDocument.SelectSingleNode($"/Library/{rootElementName}");
 
-        foreach (XmlNode childNode in parentNode.ChildNodes)
-        {
-            if (childNode.Name == rootElementName)
-            {
-                targetNode = childNode;
-                break;
-            }
-        }
-
-        if (targetNode == null)
-        {
-            targetNode = xmlDocument.CreateElement(rootElementName);
-            parentNode.AppendChild(targetNode);
-        }
-        else
-            targetNode.RemoveAll();
+        // Rimuovi tutti i nodi figli dell'elemento <Books>
+        booksNode.RemoveAll();
 
         XmlSerializer serializer = new XmlSerializer(typeof(T));
-        XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces(); //
-        namespaces.Add("", ""); //
+        XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+        namespaces.Add("", "");
 
         using (MemoryStream stream = new MemoryStream())
         {
@@ -57,13 +43,64 @@ public class XMLDataAccessLayer
             XmlDocument serializedXml = new XmlDocument();
             serializedXml.Load(stream);
 
-            XmlNode serializedRoot = serializedXml.DocumentElement;
-            XmlNode importedNode = xmlDocument.ImportNode(serializedRoot, true);
+            XmlNodeList interestedNode = serializedXml.DocumentElement.ChildNodes;
 
-            targetNode.AppendChild(importedNode);
+            // Importa ciascun nodo libro nel documento XML principale
+            foreach (XmlNode bookNode in interestedNode)
+            {
+                XmlNode importedNode = xmlDocument.ImportNode(bookNode, true);
+                booksNode.AppendChild(importedNode);
+            }
         }
 
         xmlDocument.Save(databasePath);
+
+        //XmlDocument xmlDocument = new XmlDocument();
+        //xmlDocument.Load(databasePath);
+
+        //XmlNode parentNode = xmlDocument.DocumentElement;
+        //XmlNode targetNode = null;
+
+        //foreach (XmlNode childNode in parentNode.ChildNodes)
+        //{
+        //    if (childNode.Name == rootElementName)
+        //    {
+        //        targetNode = childNode;
+        //        break;
+        //    }
+        //}
+
+        //if (targetNode == null)
+        //{
+        //    targetNode = xmlDocument.CreateElement(rootElementName);
+        //    parentNode.AppendChild(targetNode);
+        //}
+        //else
+        //    targetNode.RemoveAll();
+
+        //XmlSerializer serializer = new XmlSerializer(typeof(T));
+        //XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces(); //
+        //namespaces.Add("", "");
+
+        //using (MemoryStream stream = new MemoryStream())
+        //{
+        //    using (XmlWriter xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true }))
+        //    {
+        //        serializer.Serialize(xmlWriter, obj, namespaces);
+        //    }
+
+        //    stream.Position = 0;
+
+        //    XmlDocument serializedXml = new XmlDocument();
+        //    serializedXml.Load(stream);
+
+        //    XmlNode serializedRoot = serializedXml.DocumentElement;
+        //    XmlNode importedNode = xmlDocument.ImportNode(serializedRoot, true);
+
+        //    targetNode.AppendChild(importedNode);
+        //}
+
+        //xmlDocument.Save(databasePath);
     }
 
     public T Deserialize<T>(string rootElementName)
