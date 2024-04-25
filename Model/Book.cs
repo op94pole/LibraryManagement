@@ -9,13 +9,13 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Model
 {
     public class Book
-    {
-        private static int _bookId = 1;
+    {        
+        private static int _bookId = 0;
 
-        public Book()
-        {
-            BookId = _bookId++; // TODO: not working autoincrement => Model/Book
-        }
+        //public Book()
+        //{
+        //    BookId = _bookId++; // TODO: not working autoincrement => Model/Book
+        //}
 
         [XmlAttribute]
         public int BookId { get; set; }

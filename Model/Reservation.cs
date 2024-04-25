@@ -15,8 +15,8 @@ namespace Model
         public Reservation()
         {
             ReservationId = _reservationId++; // TODO: not working autoincrement => Model/Reservation
-            StartDate = DateTime.Now;
-            EndDate = DateTime.Now.AddDays(30);
+            StartDate = DateTime.Now.Date;
+            EndDate = StartDate.AddDays(30);
         }
 
         [XmlAttribute]

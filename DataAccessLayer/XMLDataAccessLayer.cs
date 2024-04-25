@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.IO;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Text;
-using System.Xml;
-using System.Xml.Linq;
+﻿using System.Xml;
 using System.Xml.Serialization;
-using DataAccessLayer;
-using Model;
-using static System.Reflection.Metadata.BlobBuilder;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class XMLDataAccessLayer
 {
