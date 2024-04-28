@@ -1,23 +1,23 @@
-﻿using BusinessLogic;
-using Model;
+﻿using Model;
+using BusinessLogic;
 
 namespace LibraryManagement
 {
     public class LibraryManagement
     {
+        //InterfaceManager manager = new();
+        Logic logic = new();
         XMLDataAccessLayer xmlDAL = new();
-        Logic BL = new();
-        User currentUser = new();
+        
+        List<User> users = new();
         List<Book> books = new();
         List<Reservation> reservations = new();
-        string input;
-        string choice;
-        bool success;
-        bool success1 = default;
-        int counter = 0;
+
+        User currentUser = new();
 
         public LibraryManagement()
         {
+            users = xmlDAL.Deserialize<List<User>>("Users");
             books = xmlDAL.Deserialize<List<Book>>("Books");
             reservations = xmlDAL.Deserialize<List<Reservation>>("Reservations");
         }
@@ -35,6 +35,8 @@ namespace LibraryManagement
 
         public void Login()
         {
+            bool success = default;
+
             do
             {
                 Console.Clear();
@@ -68,13 +70,15 @@ namespace LibraryManagement
             }
             else
             {
-                if (BL.DoLogin(username, password, out currentUser))
+                if (logic.ValidateLogin(username, password, out currentUser))
                 {
                     if (currentUser.Role == User.UserRole.Admin)
                     {
                         Console.Clear();
                         Console.WriteLine($"Benvenuto {currentUser.Username}! ({currentUser.Role})");
                         Console.WriteLine();
+                        Console.WriteLine("Premi un tasto qualsiasi per continuare.");
+                        Console.ReadKey();
 
                         GetAdminMenu();
                     }
@@ -83,6 +87,8 @@ namespace LibraryManagement
                         Console.Clear();
                         Console.WriteLine($"Benvenuto {currentUser.Username}! ({currentUser.Role})");
                         Console.WriteLine();
+                        Console.WriteLine("Premi un tasto qualsiasi per continuare.");
+                        Console.ReadKey();
 
                         GetUserMenu();
                     }
@@ -102,45 +108,38 @@ namespace LibraryManagement
             }
         }
 
-        public bool Retry()
+        public bool Retry() //
         {
             Console.WriteLine("Vuoi riprovare? y/n");
-            input = Console.ReadLine();
+            var input = Console.ReadLine();
 
             switch (input)
             {
                 case "y":
                     Console.Clear();
-
                     return true;
 
                 default:
                     Console.Clear();
-
                     return false;
             }
         }
 
-        public void GetAdminMenu()
+        public void GetAdminMenu() //
         {
             Console.Clear();
             Console.WriteLine("1. Ricerca un libro");
             Console.WriteLine("2. Modifica un libro");
             Console.WriteLine("3. Inserisci un nuovo libro");
-            Console.WriteLine("4. Elimina un libro");
+            Console.WriteLine("4. Rimuovi un libro");
             Console.WriteLine("5. Richiedi un prestito");
             Console.WriteLine("6. Restituisci un libro");
             Console.WriteLine("7. Visualizza lo storico delle prenotazioni");
             Console.WriteLine("8. Esci");
             Console.WriteLine();
 
-            AdminMenuChoice();
-        }
-
-        public void AdminMenuChoice()
-        {
             Console.WriteLine("Effettua una scelta e premi Invio.");
-            input = Console.ReadLine();
+            var input = Console.ReadLine();
 
             switch (input)
             {
@@ -153,7 +152,7 @@ namespace LibraryManagement
                     break;
 
                 case "3":
-                    CreatBook();
+                    InsertBook();
                     break;
 
                 case "4":
@@ -170,10 +169,10 @@ namespace LibraryManagement
 
                 case "7":
                     break;
-                    GetReservations();
+                    ShowReservations();
 
                 case "8":
-                    BL.Exit();
+                    logic.Exit();
                     break;
 
                 default:
@@ -188,7 +187,7 @@ namespace LibraryManagement
             GetAdminMenu();
         }
 
-        public void GetUserMenu()
+        public void GetUserMenu() //
         {
             Console.Clear();
             Console.WriteLine("1. Ricerca un libro");
@@ -197,13 +196,8 @@ namespace LibraryManagement
             Console.WriteLine("4. Visualizza lo storico delle prenotazioni");
             Console.WriteLine("5. Esci");
 
-            UserMenuChoice();
-        }
-
-        public void UserMenuChoice()
-        {
             Console.WriteLine("Effettua una scelta e premi Invio.");
-            input = Console.ReadLine();
+            var input = Console.ReadLine();
 
             switch (input)
             {
@@ -212,7 +206,7 @@ namespace LibraryManagement
                     break;
 
                 case "2":
-                    GetReservations();
+                    CreateReservation();
                     break;
 
                 case "3":
@@ -220,7 +214,11 @@ namespace LibraryManagement
                     break;
 
                 case "4":
-                    GetReservations();
+                    ShowReservations();
+                    break;
+
+                case "5":
+                    logic.Exit();
                     break;
 
                 default:
@@ -237,6 +235,8 @@ namespace LibraryManagement
 
         public void SearchBook()
         {
+            var choice = "";
+
             do
             {
                 Console.Clear();
@@ -245,7 +245,14 @@ namespace LibraryManagement
                 Console.Write("Cerca: ");
                 var search = Console.ReadLine();
 
-                BL.SearchBook(search);
+                try
+                {
+                    logic.GetBooks(search);
+                }
+                catch
+                {
+                    Console.WriteLine("Nessuna corrispondenza trovata!");
+                }
 
                 Console.WriteLine();
                 Console.WriteLine("Vuoi fare una nuova ricerca? y/n ");
@@ -255,13 +262,19 @@ namespace LibraryManagement
 
         public void ModifyBook()
         {
+            var title = "";
+            var authorName = "";
+            var authorSurname = "";
+            var publisher = "";
+            bool success = default;
+
             do
             {
+                int counter = 0;
+
                 Console.Clear();
                 Console.WriteLine("2. Modifica un libro");
                 Console.WriteLine();
-
-                counter = 0;
 
                 foreach (Book currentBook in books)
                 {
@@ -276,7 +289,7 @@ namespace LibraryManagement
 
                 if (bookChoice > counter || bookChoice == 0)
                 {
-                    Console.WriteLine("Scelta errata!..........................");
+                    Console.WriteLine("Input non valido!..............................");
                     Console.WriteLine();
 
                     if (!Retry())
@@ -288,53 +301,70 @@ namespace LibraryManagement
                 {
                     Console.Clear();
                     Console.Write("Inserisci il titolo: ");
-                    var _title = Console.ReadLine();
+                    title = Console.ReadLine();
                     Console.Write("Inserisci il nome dell'autore: ");
-                    var _authorName = Console.ReadLine();
+                    authorName = Console.ReadLine();
                     Console.Write("Inserisci il cognome dell'autore: ");
-                    var _authorSurname = Console.ReadLine();
+                    authorSurname = Console.ReadLine();
                     Console.Write("Inserisci la casa editrice: ");
-                    var _publisher = Console.ReadLine();
+                    publisher = Console.ReadLine();
 
-                    try
-                    {
-                        BL.ModifyBook(bookChoice, _title, _authorName, _authorSurname, _publisher);
-
-                        Console.WriteLine();
-                        Console.WriteLine("Modifica apportata con successo!");
-                        Console.WriteLine();
-                        Console.WriteLine("Vuoi modificare un altro libro? y/n");
-                        choice = Console.ReadLine();
-
-                        if (choice == "y")
-                            success1 = false;
-                        else
-                            success1 = true;
-
-                        continue;
-                    }
-                    catch (Exception e) 
+                    if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(authorName) || string.IsNullOrEmpty(authorSurname) ||
+                        string.IsNullOrEmpty(publisher)) 
                     {
                         Console.WriteLine();
-                        Console.WriteLine("Impossibile apportare la modifica! Libro già presente a sistema.");
+                        Console.Write("Input non valido!");
 
                         if (Retry())
-                            success1 = false;
+                            success = false;
                         else
-                            success1 = true;
+                            success = true;                        
                     }
-                    
+                    else
+                    {
+                        try
+                        {
+                            logic.OverrideBook(bookChoice, title, authorName, authorSurname, publisher);
+
+                            Console.WriteLine();
+                            Console.WriteLine("Modifica apportata con successo!");
+                            Console.WriteLine();
+                            Console.WriteLine("Vuoi modificare un altro libro? y/n");
+                            var choice = Console.ReadLine();
+
+                            if (choice == "y")
+                            {
+                                success = false;
+                                break;
+                            }
+                            else
+                                success = true;
+
+                            continue;
+                        }
+                        catch //
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Impossibile apportare la modifica! Libro già presente a sistema.");
+
+                            if (Retry())
+                                success = false;
+                            else
+                                success = true;
+                        }
+                    }
                 }
-            } while (!success1);
+            } while (!success);
         }
 
-        public void CreatBook()
+        public void InsertBook()
         {
-            string title;
-            string authorName;
-            string authorSurname;
-            string publisher;
+            var title = "";
+            var authorName = "";
+            var authorSurname = "";
+            var publisher = "";
             int quantity;
+            bool success = default;
 
             do
             {
@@ -349,34 +379,30 @@ namespace LibraryManagement
                 authorSurname = Console.ReadLine();
                 Console.Write("Inserisci la casa editrice: ");
                 publisher = Console.ReadLine();
-
-                do
-                {
-                    Console.Write("Inserisci la quantità: ");
-                    Int32.TryParse(Console.ReadLine(), out quantity);
-
-                    if (quantity == 0)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine("Input non valido! ");
-                    }
-                } while (quantity == 0);
+                Console.Write("Inserisci la quantità: ");
+                Int32.TryParse(Console.ReadLine(), out quantity);
 
                 if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(authorName) || string.IsNullOrEmpty(authorSurname) ||
                     string.IsNullOrEmpty(publisher) || quantity == 0)
                 {
                     Console.WriteLine();
-                    Console.Write("I campi non sono stati valorizzati tutti correttamente! ");
+                    Console.Write("I campi non sono stati valorizzati correttamente! ");
 
-                    Retry();
+                    if (Retry())
+                        success = false;
+                    else
+                    {
+                        success = true;
+                        break;
+                    }
                 }
                 else
                 {
-                    BL.AddBook(title, authorName, authorSurname, publisher, quantity);
+                    logic.AddBook(title, authorName, authorSurname, publisher, quantity);
 
                     Console.WriteLine();
                     Console.WriteLine("Vuoi inserire un altro libro? y/n");
-                    choice = Console.ReadLine();
+                    var choice = Console.ReadLine();
 
                     if (choice == "y")
                         success = false;
@@ -390,8 +416,12 @@ namespace LibraryManagement
 
         public void DeleteBook()
         {
+            bool success = default;
+
             do
             {
+                int counter = 0;
+
                 Console.Clear();
                 Console.WriteLine("2. Rimuovi un libro");
                 Console.WriteLine();
@@ -405,41 +435,109 @@ namespace LibraryManagement
 
                 Console.WriteLine();
                 Console.WriteLine("Seleziona un libro da eliminare e premi Invio.");
-                Int32.TryParse(Console.ReadLine(), out int choice1);
+                Int32.TryParse(Console.ReadLine(), out int choice);
 
-                BL.DeleteBook(choice1);
+                if (choice == 0 || choice > books.Count)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Scelta non valida! ");
 
-                Console.Clear();
-                Console.WriteLine("Libro rimosso correttamente dal sistema.");
-                Console.WriteLine();
-                Console.WriteLine("Vuoi rimuovere un altro libro? y/n");
-                choice = Console.ReadLine();
-
-                if (choice == "y")
-                    success = false;
+                    if (Retry())
+                        success = false;
+                    else
+                        success = true;
+                }
                 else
-                    success = true;
+                    try
+                    {
+                        logic.RemoveBook(choice);
+
+                        Console.Clear();
+                        Console.WriteLine("Libro rimosso correttamente dal sistema.");
+                        Console.WriteLine();
+                    }
+                    catch 
+                    {
+                        counter = 0;
+
+                        List<Reservation> bookReservations = reservations.Where(r => r.BookId == books[choice - 1].BookId && r.EndDate > DateTime.Now)
+                            .ToList();
+
+                        Console.WriteLine();
+                        Console.WriteLine("Impossibile procedere con la rimozione! Il libro risulta associato ad una o più prenotazioni " +
+                            "attive.");
+
+                        foreach (Reservation currentReservation in bookReservations)
+                        {
+                            counter++;
+                            User? associatedUser = users.Where(u => u.UserId == currentReservation.UserId).SingleOrDefault();
+
+                            Console.WriteLine($"{counter}. [{associatedUser.UserId}] {associatedUser.Username}, {currentReservation.StartDate:dd/MM/yyyy}" +
+                                $" - {currentReservation.EndDate:dd/MM/yyyy}.");
+                        }
+
+                        Console.WriteLine();
+                    }
+                    finally
+                    {
+                        Console.WriteLine("Vuoi rimuovere un altro libro? y/n");
+                        var choice1 = Console.ReadLine();
+
+                        if (choice1 == "y")
+                            success = false;
+                        else
+                            success = true;
+                    }
             } while (!success);
         }
 
         public void CreateReservation()
         {
-            Console.Clear();
-            Console.WriteLine("5. Richiedi un prestito");
-            Console.WriteLine();
+            bool success = default;
 
-            foreach (Book currentBook in books)
+            do
             {
-                counter++;
-                Console.WriteLine($"{counter}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
-                        $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}");
-            }
+                int counter = 0;
 
-            Console.WriteLine();
-            Console.WriteLine("Seleziona il libro da prenotare e premi Invio.");
-            Int32.TryParse(Console.ReadLine(), out int input);
+                Console.Clear();
+                Console.WriteLine("5. Richiedi un prestito");
+                Console.WriteLine();
 
-            BL.CreateReservation(books, input, currentUser);
+                foreach (Book currentBook in books)
+                {
+                    counter++;
+                    Console.WriteLine($"{counter}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
+                            $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}");
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("Seleziona il libro da prenotare e premi Invio.");
+                Int32.TryParse(Console.ReadLine(), out int input);
+
+                try
+                {
+                    logic.AddReservation(books, input, currentUser);
+
+                    Console.Clear();
+                    Console.WriteLine("Prenotazione effettuata con successo.");
+                    Console.WriteLine();
+                }
+                catch
+                {
+                    Console.WriteLine("Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.");
+                    Console.WriteLine();
+                }
+                finally
+                {
+                    Console.WriteLine("Vuoi prenotare un altro libro? y/n");
+                    var choice = Console.ReadLine();
+
+                    if (choice == "y")
+                        success = false;
+                    else
+                        success = true;
+                }
+            } while (!success);
         }
 
         public void ReturnBook()
@@ -447,9 +545,14 @@ namespace LibraryManagement
 
         }
 
-        public void GetReservations()
+        public void ShowReservations()
         {
 
+        }
+
+        public void CloseApplication()
+        {
+            logic.Exit();
         }
     }
 }

@@ -9,8 +9,8 @@ namespace LibraryManagement
     {
         static void Main()
         {
-            var app = new LibraryManagement();
-            app.LibraryManagementLoad();
+            var menu = new LibraryManagement();
+            menu.LibraryManagementLoad();
 
             Console.ReadKey();
         }
