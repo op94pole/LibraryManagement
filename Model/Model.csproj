@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Include="..\..\..\..\..\Downloads\Database.xml" Link="samples\Database.xml" />
+  </ItemGroup>
+
 </Project>
