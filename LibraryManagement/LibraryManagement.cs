@@ -1,7 +1,7 @@
 ﻿using Model;
 using BusinessLogic;
 
-namespace LibraryManagement
+namespace LibraryManager
 {
     public class LibraryManagement
     {

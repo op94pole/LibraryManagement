@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 using Model;
 using System.Net.NetworkInformation;
 
-namespace LibraryManagement
+namespace LibraryManager
 {
     internal class Program
     {
