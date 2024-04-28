@@ -5,16 +5,18 @@ namespace BusinessLogic
     public class Logic
     {
         private XMLDataAccessLayer xmlDAL = new();
+        private List<User> users = new();
         private List<Book> books = new();
         private List<Reservation> reservations = new();
 
         public Logic()
         {
+            users = xmlDAL.Deserialize<List<User>>("Users");
             books = xmlDAL.Deserialize<List<Book>>("Books");
             reservations = xmlDAL.Deserialize<List<Reservation>>("Reservations");
         }
 
-        public bool DoLogin(string username, string password, out User? currentUser)
+        public bool ValidateLogin(string username, string password, out User? currentUser)
         {
             currentUser = xmlDAL.Deserialize<List<User>>("Users").Where(u => u.Username == username && u.Password == password).
                 SingleOrDefault();
@@ -25,7 +27,7 @@ namespace BusinessLogic
                 return false;
         }
 
-        public List<Book> SearchBook(string search)
+        public List<Book> GetBooks(string search)
         {
             int counter = 0;
             string response = "";
@@ -37,22 +39,29 @@ namespace BusinessLogic
                 {
                     counter++;
                     response = $"{counter}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
-                        $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}";
+                        $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}. ";
+
+                    var reservedCopies = reservations.Where(r => r.BookId == currentBook.BookId && r.EndDate >
+                    DateTime.Now).Count();
+                    var firstAvailability = reservations.OrderBy(r => r.EndDate).Where(r => r.BookId ==
+                    currentBook.BookId).FirstOrDefault();
+
+                    if (reservedCopies == currentBook.Quantity)
+                        response += $"Disponibile a partire da: {firstAvailability.EndDate.AddDays(1).ToShortDateString()}";
+                    else
+                        response += "Attualmente disponibile";
 
                     Console.WriteLine(response);
                 }
             }
 
             if (response == "")
-                Console.WriteLine("Nessuna corrispondenza trovata");
+                throw new Exception("Nessuna corrispondenza trovata!");
 
             return books;
-
-            // TODO: gestire la stampa della disponibilità => BusinessLogic/SearchBook
-            // va mostrata anche la data in cui sarà possibile la prenotazione
         }
 
-        public void ModifyBook(int choice, string title, string authorName, string authorSurname, string publisher)
+        public void OverrideBook(int choice, string title, string authorName, string authorSurname, string publisher)
         {
             bool alreadyExist = default;
 
@@ -71,7 +80,7 @@ namespace BusinessLogic
                     alreadyExist = true;
             }
 
-            if (alreadyExist) 
+            if (alreadyExist)
                 throw new Exception("Impossibile apportare la modifica! Libro già presente a sistema.");
             else
             {
@@ -118,42 +127,53 @@ namespace BusinessLogic
             xmlDAL.Serialize<List<Book>>(books, "Books");
         }
 
-        public void DeleteBook(int choice)
+        public void RemoveBook(int choice)
         {
-            books.Remove(books[choice - 1]);
+            Reservation? existingReservation = reservations.Where(r => r.BookId == books[choice - 1].BookId && r.EndDate > DateTime.Now)
+                .FirstOrDefault();
 
-            xmlDAL.Serialize<List<Book>>(books, "Books");
+            if (existingReservation == null)
+            {
+                books.Remove(books[choice - 1]);
+                xmlDAL.Serialize<List<Book>>(books, "Books");
 
-            // TODO: gestire la rimozione del libro in base alle prenotazioni attive => BusinessLogic/DeleteBook
-            // è possibile rimuovere un libro dal sistema solo se non ci sono prenotazioni attive => messaggio di errore
-            // per ogni prenotazione con indicate le informazioni dell'utente che ha attiva la prenotazione e fino a quando
-            // con l'eliminazione del libro da sistema va cancellato pure lo storico delle sue prenotazioni
+                reservations.Remove(existingReservation);
+                xmlDAL.Serialize<List<Reservation>>(reservations, "Reservations");
+            }
+            else
+                throw new Exception("Impossibile procedere con la rimozione! Il libro risulta associato ad una prenotazione attiva.");
         }
 
-        public void CreateReservation(List<Book> filtered, int choice, User currentUser) //
+        public void AddReservation(List<Book> filtered, int choice, User currentUser) //
         {
-            Book reservated = filtered[choice - 1]; 
-            Reservation newReservation = new Reservation 
+            Reservation newReservation = new Reservation
             {
-                UserId = currentUser.UserId,  
-                BookId = filtered[choice - 1].BookId 
+                ReservationId = 1 + reservations[reservations.Count - 1].ReservationId,
+                UserId = currentUser.UserId,
+                BookId = filtered[choice - 1].BookId
             };
 
-            reservations.Add(newReservation);
+            Reservation? alreadyExist = reservations.Where(r => r.BookId == newReservation.BookId)
+                .SingleOrDefault();
 
-            xmlDAL.Serialize(reservations, "Reservations");
+            if (alreadyExist == null || alreadyExist.EndDate < DateTime.Now)
+            {
+                reservations.Add(newReservation);
+                xmlDAL.Serialize(reservations, "Reservations");
+            }
+            else
+                throw new Exception("Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.");
 
             // TODO: gestire la sovrapposizione di richieste
-            // Un libro può essere prenotato solo se non sono attive prenotazioni e se la prenotazione corrente non va a
-            // sovrapporsi ad una prenotazione successiva esistente => messaggio di errore
+            // Un libro può essere prenotato solo se non sono attive prenotazioni (reservations < quantity)
         }
 
-        public void ReturnBook() //
+        public void RemoveReservation() //
         {
             // messaggio di errore se il libro non risulta prenotato
         }
 
-        public List<Reservation> GetReservation() //
+        public List<Reservation> GetReservations() //
         {
             return reservations;
         }
