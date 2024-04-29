@@ -1,6 +1,7 @@
 ﻿using Model;
 using BusinessLogic;
 using System.Security;
+using DataAccessLayer;
 
 namespace LibraryManager
 {
@@ -175,7 +176,7 @@ namespace LibraryManager
                     break;
 
                 case "7":
-                    ShowReservations(currentUser);
+                    ShowReservations();
                     break;
 
                 case "8":
@@ -220,7 +221,7 @@ namespace LibraryManager
                     break;
 
                 case "4":
-                    ShowReservations(currentUser);
+                    ShowReservations();
                     break;
 
                 case "5":
@@ -679,7 +680,29 @@ namespace LibraryManager
 
         public void ShowReservations()
         {
+            var choice = "";
 
+            do
+            {
+                Console.Clear();
+                Console.WriteLine("1. Visualizza lo storico delle prenotazioni");
+                Console.WriteLine();
+                Console.Write("Cerca: ");
+                var search = Console.ReadLine();
+
+                try
+                {
+                    logic.GetReservations(currentUser, search);
+                }
+                catch
+                {
+                    Console.WriteLine("Nessuna corrispondenza trovata!");
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("Vuoi fare una nuova ricerca? y/n ");
+                choice = Console.ReadLine();
+            } while (choice == "y");
         }
 
         public void CloseApplication()
