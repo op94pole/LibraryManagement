@@ -128,6 +128,7 @@ namespace BusinessLogic
             if (!alreadyExist)
             {
                 var newBook = new Book();
+                newBook.BookId = (books.Count == 0 ? 1 : (books[books.Count - 1].BookId + 1));
                 newBook.BookId = 1 + books[books.Count - 1].BookId;
                 newBook.Title = title;
                 newBook.AuthorName = authorName;
