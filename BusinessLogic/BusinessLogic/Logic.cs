@@ -22,9 +22,13 @@ namespace BusinessLogic
                 SingleOrDefault();
 
             if (currentUser != null)
+            {
                 return true;
+            }
             else
+            {
                 return false;
+            }
         }
 
         public List<Book> GetBooks(string search)
@@ -47,16 +51,22 @@ namespace BusinessLogic
                     currentBook.BookId).FirstOrDefault();
 
                     if (reservedCopies == currentBook.Quantity)
+                    {
                         response += $"Disponibile a partire da: {firstAvailability.EndDate.AddDays(1).ToShortDateString()}";
+                    }
                     else
+                    {
                         response += "Attualmente disponibile";
+                    }
 
                     Console.WriteLine(response);
                 }
             }
 
             if (response == "")
+            {
                 throw new Exception("Nessuna corrispondenza trovata!");
+            }
 
             return books;
         }
@@ -77,11 +87,15 @@ namespace BusinessLogic
             {
                 if (book.Title == modifiedBook.Title && book.AuthorName == modifiedBook.AuthorName && book.AuthorSurname ==
                     modifiedBook.AuthorSurname && book.Publisher == modifiedBook.Publisher)
+                {
                     alreadyExist = true;
+                }
             }
 
             if (alreadyExist)
+            {
                 throw new Exception("Impossibile apportare la modifica! Libro già presente a sistema.");
+            }
             else
             {
                 books[choice - 1].Title = title;
@@ -106,7 +120,6 @@ namespace BusinessLogic
                 {
                     currentBook.Quantity += quantity;
                     alreadyExist = true;
-
                     break;
                 }
             }
@@ -141,42 +154,88 @@ namespace BusinessLogic
                 xmlDAL.Serialize<List<Reservation>>(reservations, "Reservations");
             }
             else
+            {
                 throw new Exception("Impossibile procedere con la rimozione! Il libro risulta associato ad una prenotazione attiva.");
+            }
         }
 
-        public void AddReservation(List<Book> filtered, int choice, User currentUser) //
+        public void AddReservation(/*List<Book> filtered,*/ int choice, User currentUser)
         {
             Reservation newReservation = new Reservation
             {
-                ReservationId = 1 + reservations[reservations.Count - 1].ReservationId,
+                ReservationId = (reservations.Count == 0 ? 1 : (reservations[reservations.Count - 1].ReservationId + 1)),
                 UserId = currentUser.UserId,
-                BookId = filtered[choice - 1].BookId
+                BookId = books[choice - 1].BookId
             };
 
-            Reservation? alreadyExist = reservations.Where(r => r.BookId == newReservation.BookId)
-                .SingleOrDefault();
+            List<Reservation> currentBookReservations = reservations.Where(r => r.BookId == newReservation.BookId).ToList(); 
+            Reservation? currentUserBookReservation = currentBookReservations.Where(r => r.UserId == currentUser.UserId
+            && r.EndDate > DateTime.Now).OrderByDescending(r => r.EndDate).SingleOrDefault(); 
 
-            if (alreadyExist == null || alreadyExist.EndDate < DateTime.Now)
+            if (currentBookReservations.Count >= books[choice - 1].Quantity)
+            {
+                throw new Exception("Impossibile proseguire con la prenotazione! Tutte le copie di questo libro risultano in prestito.");
+            }
+            if (currentUserBookReservation != null)
+            {
+                throw new Exception("Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.");
+            }
+            else
             {
                 reservations.Add(newReservation);
                 xmlDAL.Serialize(reservations, "Reservations");
             }
-            else
-                throw new Exception("Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.");
-
-            // TODO: gestire la sovrapposizione di richieste
-            // Un libro può essere prenotato solo se non sono attive prenotazioni (reservations < quantity)
         }
 
-        public void RemoveReservation() //
+        public void RemoveReservation(User currentUser, Book bookToReturn) 
         {
-            // messaggio di errore se il libro non risulta prenotato
+            Reservation? currentReservation = reservations.Where(r => r.BookId == bookToReturn.BookId && 
+            r.UserId == currentUser.UserId).SingleOrDefault();
+            currentReservation.EndDate = DateTime.Now.Date;
+
+            xmlDAL.Serialize(reservations, "Reservations");
         }
 
-        public List<Reservation> GetReservations() //
-        {
-            return reservations;
-        }
+        //public List<Reservation> GetReservations(User currentUser, string search) //
+        //{
+            //int counter = 0;
+            //string response = "";
+
+            //foreach (Reservation currentReservation in reservations)
+            //{
+            //    counter++;
+
+            //    if (currentReservation.UserId.ToString().Contains(search) || currentReservation.BookId.ToString().Contains(search))
+            //    {
+            //        counter++;
+            //        response = $"{counter}. Titolo: {currentReservation.BookId}, Utente: {currentReservation.UserId}, " +
+            //            $"Data: {currentReservation.StartDate} - {currentReservation.EndDate}.";
+
+            //        var reservedCopies = reservations.Where(r => r.BookId == currentReservation.BookId && r.EndDate >
+            //        DateTime.Now).Count();
+            //        var firstAvailability = reservations.OrderBy(r => r.EndDate).Where(r => r.BookId ==
+            //        currentReservation.BookId).FirstOrDefault();
+
+            //        if (reservedCopies == currentReservation.Quantity)
+            //        {
+            //            response += $"Disponibile a partire da: {firstAvailability.EndDate.AddDays(1).ToShortDateString()}";
+            //        }
+            //        else
+            //        {
+            //            response += "Attualmente disponibile";
+            //        }
+
+            //        Console.WriteLine(response);
+            //    }
+            //}
+
+            //if (response == "")
+            //{
+            //    throw new Exception("Nessuna corrispondenza trovata!");
+            //}
+
+            //return books;
+        //}
 
         public void Exit()
         {

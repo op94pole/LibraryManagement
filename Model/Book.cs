@@ -9,14 +9,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Model
 {
     public class Book
-    {        
-        private static int _bookId = 0;
-
-        //public Book()
-        //{
-        //    BookId = _bookId++; // TODO: not working autoincrement => Model/Book
-        //}
-
+    {    
         [XmlAttribute]
         public int BookId { get; set; }
         [XmlAttribute]
@@ -28,8 +21,6 @@ namespace Model
         [XmlAttribute]
         public string Publisher { get; set; }
         [XmlAttribute]
-        public int Quantity { get; set; }
-        [XmlIgnore]
-        public List<Book> BooksList { get; set; }
+        public int Quantity { get; set; }        
     }
 }

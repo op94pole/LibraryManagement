@@ -10,7 +10,7 @@ public class XMLDataAccessLayer
         XmlDocument xmlDocument = new XmlDocument();
         xmlDocument.Load(databasePath);
 
-        XmlNode booksNode = xmlDocument.SelectSingleNode($"/Library/{rootElementName}");
+        XmlNode booksNode = xmlDocument.SelectSingleNode($"/Library/{rootElementName}"); //
         booksNode.RemoveAll();
 
         XmlSerializer serializer = new XmlSerializer(typeof(T));
@@ -29,7 +29,7 @@ public class XMLDataAccessLayer
             XmlDocument serializedXml = new XmlDocument();
             serializedXml.Load(stream);
 
-            XmlNodeList interestedNode = serializedXml.DocumentElement.ChildNodes;
+            XmlNodeList interestedNode = serializedXml.DocumentElement.ChildNodes; //
 
             foreach (XmlNode bookNode in interestedNode)
             {

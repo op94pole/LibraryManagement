@@ -1,9 +1,4 @@
-﻿using BusinessLogic;
-using System.Xml.Serialization;
-using Model;
-using System.Net.NetworkInformation;
-
-namespace LibraryManagement
+﻿namespace LibraryManagement
 {
     internal class Program
     {

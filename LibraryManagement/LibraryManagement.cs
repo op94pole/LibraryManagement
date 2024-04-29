@@ -1,14 +1,14 @@
 ﻿using Model;
 using BusinessLogic;
+using System.Security;
 
 namespace LibraryManagement
 {
     public class LibraryManagement
     {
-        //InterfaceManager manager = new();
         Logic logic = new();
         XMLDataAccessLayer xmlDAL = new();
-        
+
         List<User> users = new();
         List<Book> books = new();
         List<Reservation> reservations = new();
@@ -48,9 +48,13 @@ namespace LibraryManagement
                 var password = Console.ReadLine();
 
                 if (CredentialsCheck(username, password))
+                {
                     success = true;
+                }
                 else
+                {
                     success = false;
+                }
             } while (!success);
         }
 
@@ -99,16 +103,20 @@ namespace LibraryManagement
                     Console.Write("Username o password errati! ");
 
                     if (Retry())
+                    {
                         Login();
+                    }
                     else
+                    {
                         LibraryManagementLoad();
+                    }
                 }
 
                 return true;
             }
         }
 
-        public bool Retry() //
+        public bool Retry()
         {
             Console.WriteLine("Vuoi riprovare? y/n");
             var input = Console.ReadLine();
@@ -125,7 +133,7 @@ namespace LibraryManagement
             }
         }
 
-        public void GetAdminMenu() //
+        public void GetAdminMenu()
         {
             Console.Clear();
             Console.WriteLine("1. Ricerca un libro");
@@ -137,7 +145,6 @@ namespace LibraryManagement
             Console.WriteLine("7. Visualizza lo storico delle prenotazioni");
             Console.WriteLine("8. Esci");
             Console.WriteLine();
-
             Console.WriteLine("Effettua una scelta e premi Invio.");
             var input = Console.ReadLine();
 
@@ -164,12 +171,12 @@ namespace LibraryManagement
                     break;
 
                 case "6":
-                    break;
                     ReturnBook();
+                    break;
 
                 case "7":
+                    ShowReservations(currentUser);
                     break;
-                    ShowReservations();
 
                 case "8":
                     logic.Exit();
@@ -187,7 +194,7 @@ namespace LibraryManagement
             GetAdminMenu();
         }
 
-        public void GetUserMenu() //
+        public void GetUserMenu()
         {
             Console.Clear();
             Console.WriteLine("1. Ricerca un libro");
@@ -195,7 +202,6 @@ namespace LibraryManagement
             Console.WriteLine("3. Restituisci un libro");
             Console.WriteLine("4. Visualizza lo storico delle prenotazioni");
             Console.WriteLine("5. Esci");
-
             Console.WriteLine("Effettua una scelta e premi Invio.");
             var input = Console.ReadLine();
 
@@ -214,7 +220,7 @@ namespace LibraryManagement
                     break;
 
                 case "4":
-                    ShowReservations();
+                    ShowReservations(currentUser);
                     break;
 
                 case "5":
@@ -293,7 +299,9 @@ namespace LibraryManagement
                     Console.WriteLine();
 
                     if (!Retry())
+                    {
                         GetAdminMenu();
+                    }
 
                     continue;
                 }
@@ -310,15 +318,19 @@ namespace LibraryManagement
                     publisher = Console.ReadLine();
 
                     if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(authorName) || string.IsNullOrEmpty(authorSurname) ||
-                        string.IsNullOrEmpty(publisher)) 
+                        string.IsNullOrEmpty(publisher))
                     {
                         Console.WriteLine();
                         Console.Write("Input non valido!");
 
                         if (Retry())
+                        {
                             success = false;
+                        }
                         else
-                            success = true;                        
+                        {
+                            success = true;
+                        }
                     }
                     else
                     {
@@ -338,19 +350,25 @@ namespace LibraryManagement
                                 break;
                             }
                             else
+                            {
                                 success = true;
+                            }
 
                             continue;
                         }
-                        catch //
+                        catch
                         {
                             Console.WriteLine();
                             Console.WriteLine("Impossibile apportare la modifica! Libro già presente a sistema.");
 
                             if (Retry())
+                            {
                                 success = false;
+                            }
                             else
+                            {
                                 success = true;
+                            }
                         }
                     }
                 }
@@ -389,7 +407,9 @@ namespace LibraryManagement
                     Console.Write("I campi non sono stati valorizzati correttamente! ");
 
                     if (Retry())
+                    {
                         success = false;
+                    }
                     else
                     {
                         success = true;
@@ -405,9 +425,13 @@ namespace LibraryManagement
                     var choice = Console.ReadLine();
 
                     if (choice == "y")
+                    {
                         success = false;
+                    }
                     else
+                    {
                         success = true;
+                    }
 
                     continue;
                 }
@@ -443,9 +467,13 @@ namespace LibraryManagement
                     Console.WriteLine("Scelta non valida! ");
 
                     if (Retry())
+                    {
                         success = false;
+                    }
                     else
+                    {
                         success = true;
+                    }
                 }
                 else
                     try
@@ -456,23 +484,21 @@ namespace LibraryManagement
                         Console.WriteLine("Libro rimosso correttamente dal sistema.");
                         Console.WriteLine();
                     }
-                    catch 
+                    catch
                     {
                         counter = 0;
 
-                        List<Reservation> bookReservations = reservations.Where(r => r.BookId == books[choice - 1].BookId && r.EndDate > DateTime.Now)
-                            .ToList();
+                        List<Reservation> bookReservations = reservations.Where(r => r.BookId == books[choice - 1].BookId && r.EndDate > DateTime.Now).ToList();
 
                         Console.WriteLine();
-                        Console.WriteLine("Impossibile procedere con la rimozione! Il libro risulta associato ad una o più prenotazioni " +
-                            "attive.");
+                        Console.WriteLine("Impossibile procedere con la rimozione! Il libro risulta associato ad una o più prenotazioni attive.");
 
                         foreach (Reservation currentReservation in bookReservations)
                         {
                             counter++;
                             User? associatedUser = users.Where(u => u.UserId == currentReservation.UserId).SingleOrDefault();
 
-                            Console.WriteLine($"{counter}. [{associatedUser.UserId}] {associatedUser.Username}, {currentReservation.StartDate:dd/MM/yyyy}" +
+                            Console.WriteLine($"{counter}. Utente: {associatedUser.Username}, Data: {currentReservation.StartDate:dd/MM/yyyy}" +
                                 $" - {currentReservation.EndDate:dd/MM/yyyy}.");
                         }
 
@@ -484,9 +510,13 @@ namespace LibraryManagement
                         var choice1 = Console.ReadLine();
 
                         if (choice1 == "y")
+                        {
                             success = false;
+                        }
                         else
+                        {
                             success = true;
+                        }
                     }
             } while (!success);
         }
@@ -514,40 +544,156 @@ namespace LibraryManagement
                 Console.WriteLine("Seleziona il libro da prenotare e premi Invio.");
                 Int32.TryParse(Console.ReadLine(), out int input);
 
-                try
+                if (input != 0 && input <= books.Count)
                 {
-                    logic.AddReservation(books, input, currentUser);
+                    try
+                    {
+                        logic.AddReservation(input, currentUser);
 
-                    Console.Clear();
-                    Console.WriteLine("Prenotazione effettuata con successo.");
-                    Console.WriteLine();
-                }
-                catch
-                {
-                    Console.WriteLine("Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.");
-                    Console.WriteLine();
-                }
-                finally
-                {
-                    Console.WriteLine("Vuoi prenotare un altro libro? y/n");
-                    var choice = Console.ReadLine();
+                        Console.Clear();
+                        Console.WriteLine("Prenotazione effettuata con successo.");
+                        Console.WriteLine();
+                    }
+                    catch (Exception ex) when (ex.Message == "Impossibile proseguire con la prenotazione! Tutte le copie di questo libro risultano in prestito.")
+                    {
+                        Console.WriteLine("Impossibile proseguire con la prenotazione! Tutte le copie di questo libro risultano in prestito.");
+                        Console.WriteLine();
+                    }
+                    catch (Exception ex1) when (ex1.Message == "Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.")
+                    {
+                        Console.WriteLine("Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.");
+                        Console.WriteLine();
+                    }
+                    finally
+                    {
+                        Console.WriteLine("Vuoi prenotare un altro libro? y/n");
+                        var choice = Console.ReadLine();
 
-                    if (choice == "y")
+                        if (choice == "y")
+                        {
+                            success = false;
+                        }
+                        else
+                        {
+                            success = true;
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Input non valido! ");
+                    Console.WriteLine();
+
+                    if (Retry())
+                    {
                         success = false;
+                    }
                     else
+                    {
                         success = true;
+                    }
                 }
             } while (!success);
         }
 
         public void ReturnBook()
         {
+            bool success = default;
 
+            do
+            {
+                int counter = 0;
+
+                Console.Clear();
+                Console.WriteLine("6. Restituisci un libro");
+                Console.WriteLine();
+                
+                foreach (Book currentBook in books)
+                {
+                    counter++;
+
+                    Console.WriteLine($"{counter}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
+                    $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}");
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("Seleziona il libro da restituire e premi Invio.");
+                Int32.TryParse(Console.ReadLine(), out int input);
+
+                if (input != 0 && input <= counter)
+                {
+                    Reservation reservated = reservations.Where(r => r.BookId == books[input - 1].BookId && r.UserId == currentUser.UserId && 
+                    r.EndDate > DateTime.Now).FirstOrDefault();
+
+                    if (reservated != null)
+                    {
+                        Book bookToReturn = books[input - 1];
+                        logic.RemoveReservation(currentUser, bookToReturn);
+                        Console.WriteLine("Libro restituito con successo.");
+
+                        Console.WriteLine();
+                        Console.WriteLine("Vuoi restituire un altro libro? y/n");
+                        var choice = Console.ReadLine();
+
+                        if (choice == "y")
+                        {
+                            success = false;
+                        }
+                        else
+                        {
+                            success = true;
+                        }
+
+                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Non hai questo libro in prestito! ");
+
+                        if (Retry())
+                        {
+                            success = false;
+                        }
+                        else
+                        {
+                            success = true;
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Input non valido! ");
+
+                    if (Retry())
+                    {
+                        success = false;
+                    }
+                    else
+                    {
+                        success = true;
+                    }
+                }
+            } while (!success);
         }
 
-        public void ShowReservations()
+        public void ShowReservations(User currentUser)
         {
+            //int counter = 0;
 
+            //if (currentUser.Role == User.UserRole.Admin)
+            //{
+            //    foreach (Reservation currentReservation in logic.GetReservations())
+            //    {
+            //        counter++;
+
+            //        Console.WriteLine($"{counter}. )
+            //    }
+            //}
+            //if (currentUser.Role == User.UserRole.User)
+            //{
+
+            //}
         }
 
         public void CloseApplication()
