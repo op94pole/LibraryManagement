@@ -43,21 +43,19 @@ namespace BusinessLogic
                     currentBook.AuthorSurname.ToLower().Contains(search) || currentBook.Publisher.ToLower().Contains(search))
                 {
                     counter++;
-                    response = $"{counter}. Titolo: {currentBook.Title}, Autore: {currentBook.AuthorName} " +
-                        $"{currentBook.AuthorSurname}, Casa editrice: {currentBook.Publisher}. ";
+                    response = $"\n{counter}.\nTitolo: {currentBook.Title}\nAutore: {currentBook.AuthorName} " +
+                        $"{currentBook.AuthorSurname}\nCasa editrice: {currentBook.Publisher}\n";
 
-                    var reservedCopies = reservations.Where(r => r.BookId == currentBook.BookId && r.EndDate >
-                    DateTime.Now).Count();
-                    var firstAvailability = reservations.OrderBy(r => r.EndDate).Where(r => r.BookId ==
-                    currentBook.BookId).FirstOrDefault();
+                    var reservedCopies = reservations.Where(r => r.BookId == currentBook.BookId && r.EndDate > DateTime.Now).Count();
+                    var firstAvailability = reservations.OrderBy(r => r.EndDate).Where(r => r.BookId == currentBook.BookId).FirstOrDefault();
 
                     if (reservedCopies == currentBook.Quantity)
                     {
-                        response += $"Disponibile a partire da: {firstAvailability.EndDate.AddDays(1).ToShortDateString()}";
+                        response += $"Info: Disponibile a partire da: {firstAvailability.EndDate.AddDays(1).ToShortDateString()}";
                     }
                     else
                     {
-                        response += "Attualmente disponibile";
+                        response += "Info: Attualmente disponibile";
                     }
 
                     Console.WriteLine(response);
@@ -149,11 +147,15 @@ namespace BusinessLogic
 
             if (existingReservation == null)
             {
+                foreach (Reservation currentReservation in reservations.Where(r => r.BookId == books[choice - 1].BookId).ToList())
+                {
+                    reservations.Remove(currentReservation);
+                }
+
+                xmlDAL.Serialize<List<Reservation>>(reservations, "Reservations");
+
                 books.Remove(books[choice - 1]);
                 xmlDAL.Serialize<List<Book>>(books, "Books");
-
-                reservations.Remove(existingReservation);
-                xmlDAL.Serialize<List<Reservation>>(reservations, "Reservations");
             }
             else
             {
@@ -170,9 +172,10 @@ namespace BusinessLogic
                 BookId = books[choice - 1].BookId
             };
 
-            List<Reservation> currentBookReservations = reservations.Where(r => r.BookId == newReservation.BookId).ToList();
-            Reservation? currentUserBookReservation = currentBookReservations.Where(r => r.UserId == currentUser.UserId
-            && r.EndDate > DateTime.Now).OrderByDescending(r => r.EndDate).SingleOrDefault();
+            List<Reservation> currentBookReservations = reservations.Where(r => r.BookId == newReservation.BookId &&
+            r.EndDate > DateTime.Now).ToList();
+            Reservation? currentUserBookReservation = currentBookReservations.Where(r => r.UserId == currentUser.UserId).
+                OrderByDescending(r => r.EndDate).SingleOrDefault();
 
             if (currentBookReservations.Count >= books[choice - 1].Quantity)
             {
@@ -189,30 +192,38 @@ namespace BusinessLogic
             }
         }
 
-        public void RemoveReservation(User currentUser, Book bookToReturn)
+        public bool RemoveReservation(User currentUser, Book bookToReturn)
         {
-            Reservation? currentReservation = reservations.Where(r => r.BookId == bookToReturn.BookId &&
-            r.UserId == currentUser.UserId).SingleOrDefault();
-            currentReservation.EndDate = DateTime.Now.Date;
+            Reservation? currentReservation = reservations.Where(r => r.BookId == bookToReturn.BookId && r.UserId == currentUser.UserId 
+            && r.EndDate > DateTime.Now).SingleOrDefault();           
 
-            xmlDAL.Serialize(reservations, "Reservations");
+            if (currentReservation == null)
+            { 
+                return false; 
+            }
+            else
+            {
+                currentReservation.EndDate = DateTime.Now.Date;
+                xmlDAL.Serialize(reservations, "Reservations");
+                return true;
+            }
         }
 
-        public void GetReservations(User currentUser, string search) //
+        public void GetReservations(User currentUser, string search) 
         {
-            User? currentU = new User();
-            Book? currentB = new Book();
+            User? user = new User();
+            Book? book = new Book();
             string state = "";
 
             if (currentUser.Role == User.UserRole.Admin)
             {
                 foreach (Reservation currentReservation in reservations)
                 {
-                    currentU = users.Where(u => u.UserId == currentReservation.UserId).FirstOrDefault();
-                    currentB = books.Where(b => b.BookId == currentReservation.BookId).FirstOrDefault();
+                    user = users.Where(u => u.UserId == currentReservation.UserId).FirstOrDefault();
+                    book = books.Where(b => b.BookId == currentReservation.BookId).FirstOrDefault();
 
-                    if (currentU.Username.ToLower().Contains(search) || currentB.Title.ToLower().Contains(search) || currentB.AuthorName.ToLower().Contains(search)
-                        || currentB.AuthorSurname.ToLower().Contains(search) || currentB.Publisher.ToLower().Contains(search))
+                    if (user.Username.ToLower().Contains(search) || book.Title.ToLower().Contains(search) || book.AuthorName.ToLower().Contains(search)
+                        || book.AuthorSurname.ToLower().Contains(search) || book.Publisher.ToLower().Contains(search))
                     {
                         if (currentReservation.EndDate > DateTime.Now)
                         {
@@ -223,32 +234,7 @@ namespace BusinessLogic
                             state = "non attiva";
                         }
 
-                        Console.WriteLine($"Titolo: {currentB.Title}\nUtente: {currentU.Username}\nData inizio: {currentReservation.StartDate.ToShortDateString()}\n" +
-                            $"Data fine: {currentReservation.EndDate.ToShortDateString()}\nInfo sulla prenotazione: {state}");
-                        Console.WriteLine();
-                    }
-                }
-            }
-            if (currentUser.Role == User.UserRole.User)
-            {
-                foreach (Reservation currentReservation in reservations)
-                {
-                    currentU = users.Where(u => u.UserId == currentReservation.UserId).FirstOrDefault();
-                    currentB = books.Where(b => b.BookId == currentReservation.BookId).FirstOrDefault();
-
-                    if (currentB.Title.ToLower().Contains(search) || currentB.AuthorName.ToLower().Contains(search)
-                        || currentB.AuthorSurname.ToLower().Contains(search) || currentB.Publisher.ToLower().Contains(search))
-                    {
-                        if (currentReservation.EndDate > DateTime.Now)
-                        {
-                            state = "attiva";
-                        }
-                        if (currentReservation.EndDate < DateTime.Now)
-                        {
-                            state = "non attiva";
-                        }
-
-                        Console.WriteLine($"Titolo: {currentB.Title}\nUtente: {currentU.Username}\nData inizio: {currentReservation.StartDate.ToShortDateString()}\n" +
+                        Console.WriteLine($"Titolo: {book.Title}\nUtente: {user.Username}\nData inizio: {currentReservation.StartDate.ToShortDateString()}\n" +
                             $"Data fine: {currentReservation.EndDate.ToShortDateString()}\nInfo sulla prenotazione: {state}");
                         Console.WriteLine();
                     }
@@ -258,7 +244,39 @@ namespace BusinessLogic
                     }
                 }
             }
+            if (currentUser.Role == User.UserRole.User)
+            {
+                foreach (Reservation currentReservation in reservations)
+                {
+                    user = users.Where(u => u.UserId == currentReservation.UserId && u.UserId == currentUser.UserId).FirstOrDefault();
+                    book = books.Where(b => b.BookId == currentReservation.BookId).FirstOrDefault();
 
+                    if (book.Title.ToLower().Contains(search) || book.AuthorName.ToLower().Contains(search)
+                        || book.AuthorSurname.ToLower().Contains(search) || book.Publisher.ToLower().Contains(search))
+                    {
+                        if (user == null)
+                        {
+                            continue;
+                        }
+                        if (currentReservation.EndDate > DateTime.Now)
+                        {
+                            state = "attiva";
+                        }
+                        if (currentReservation.EndDate < DateTime.Now)
+                        {
+                            state = "non attiva";
+                        }
+
+                        Console.WriteLine($"Titolo: {book.Title}\nUtente: {user.Username}\nData inizio: {currentReservation.StartDate.ToShortDateString()}\n" +
+                            $"Data fine: {currentReservation.EndDate.ToShortDateString()}\nInfo sulla prenotazione: {state}");
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        throw new Exception("Nessuna corrispondenza trovata!");
+                    }
+                }
+            }
         }
 
         public void Exit()

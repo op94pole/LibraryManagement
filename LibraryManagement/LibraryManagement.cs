@@ -80,7 +80,7 @@ namespace LibraryManager
                     if (currentUser.Role == User.UserRole.Admin)
                     {
                         Console.Clear();
-                        Console.WriteLine($"Benvenuto {currentUser.Username}! ({currentUser.Role})");
+                        Console.WriteLine($"Benvenuto/a {currentUser.Username}! ({currentUser.Role})");
                         Console.WriteLine();
                         Console.WriteLine("Premi un tasto qualsiasi per continuare.");
                         Console.ReadKey();
@@ -203,6 +203,7 @@ namespace LibraryManager
             Console.WriteLine("3. Restituisci un libro");
             Console.WriteLine("4. Visualizza lo storico delle prenotazioni");
             Console.WriteLine("5. Esci");
+            Console.WriteLine();
             Console.WriteLine("Effettua una scelta e premi Invio.");
             var input = Console.ReadLine();
 
@@ -491,7 +492,7 @@ namespace LibraryManager
 
                         List<Reservation> bookReservations = reservations.Where(r => r.BookId == books[choice - 1].BookId && r.EndDate > DateTime.Now).ToList();
 
-                        Console.WriteLine();
+                        Console.Clear();
                         Console.WriteLine("Impossibile procedere con la rimozione! Il libro risulta associato ad una o più prenotazioni attive.");
 
                         foreach (Reservation currentReservation in bookReservations)
@@ -557,11 +558,13 @@ namespace LibraryManager
                     }
                     catch (Exception ex) when (ex.Message == "Impossibile proseguire con la prenotazione! Tutte le copie di questo libro risultano in prestito.")
                     {
+                        Console.Clear();
                         Console.WriteLine("Impossibile proseguire con la prenotazione! Tutte le copie di questo libro risultano in prestito.");
                         Console.WriteLine();
                     }
                     catch (Exception ex1) when (ex1.Message == "Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.")
                     {
+                        Console.Clear();
                         Console.WriteLine("Impossibile proseguire con la prenotazione! Possiedi già questo libro in prestito.");
                         Console.WriteLine();
                     }
@@ -597,7 +600,7 @@ namespace LibraryManager
             } while (!success);
         }
 
-        public void ReturnBook()
+        public void ReturnBook() 
         {
             bool success = default;
 
@@ -608,7 +611,7 @@ namespace LibraryManager
                 Console.Clear();
                 Console.WriteLine("6. Restituisci un libro");
                 Console.WriteLine();
-                
+
                 foreach (Book currentBook in books)
                 {
                     counter++;
@@ -623,13 +626,11 @@ namespace LibraryManager
 
                 if (input != 0 && input <= counter)
                 {
-                    Reservation reservated = reservations.Where(r => r.BookId == books[input - 1].BookId && r.UserId == currentUser.UserId && 
-                    r.EndDate > DateTime.Now).FirstOrDefault();
+                    Book bookToReturn = books[input - 1];
 
-                    if (reservated != null)
+                    if (logic.RemoveReservation(currentUser, bookToReturn))
                     {
-                        Book bookToReturn = books[input - 1];
-                        logic.RemoveReservation(currentUser, bookToReturn);
+                        Console.Clear();
                         Console.WriteLine("Libro restituito con successo.");
 
                         Console.WriteLine();
@@ -649,8 +650,8 @@ namespace LibraryManager
                     }
                     else
                     {
-                        Console.WriteLine();
-                        Console.WriteLine("Non hai questo libro in prestito! ");
+                        Console.Clear();
+                        Console.WriteLine("Impossibile procedere con la restituzione! Non hai questo libro in prestito. ");
 
                         if (Retry())
                         {
@@ -696,10 +697,10 @@ namespace LibraryManager
                 }
                 catch
                 {
+                    Console.Clear();
                     Console.WriteLine("Nessuna corrispondenza trovata!");
                 }
 
-                Console.WriteLine();
                 Console.WriteLine("Vuoi fare una nuova ricerca? y/n ");
                 choice = Console.ReadLine();
             } while (choice == "y");
