@@ -196,46 +196,10 @@ namespace BusinessLogic
             xmlDAL.Serialize(reservations, "Reservations");
         }
 
-        //public List<Reservation> GetReservations(User currentUser, string search) //
-        //{
-            //int counter = 0;
-            //string response = "";
+        public void GetReservations() //
+        {
 
-            //foreach (Reservation currentReservation in reservations)
-            //{
-            //    counter++;
-
-            //    if (currentReservation.UserId.ToString().Contains(search) || currentReservation.BookId.ToString().Contains(search))
-            //    {
-            //        counter++;
-            //        response = $"{counter}. Titolo: {currentReservation.BookId}, Utente: {currentReservation.UserId}, " +
-            //            $"Data: {currentReservation.StartDate} - {currentReservation.EndDate}.";
-
-            //        var reservedCopies = reservations.Where(r => r.BookId == currentReservation.BookId && r.EndDate >
-            //        DateTime.Now).Count();
-            //        var firstAvailability = reservations.OrderBy(r => r.EndDate).Where(r => r.BookId ==
-            //        currentReservation.BookId).FirstOrDefault();
-
-            //        if (reservedCopies == currentReservation.Quantity)
-            //        {
-            //            response += $"Disponibile a partire da: {firstAvailability.EndDate.AddDays(1).ToShortDateString()}";
-            //        }
-            //        else
-            //        {
-            //            response += "Attualmente disponibile";
-            //        }
-
-            //        Console.WriteLine(response);
-            //    }
-            //}
-
-            //if (response == "")
-            //{
-            //    throw new Exception("Nessuna corrispondenza trovata!");
-            //}
-
-            //return books;
-        //}
+        }
 
         public void Exit()
         {

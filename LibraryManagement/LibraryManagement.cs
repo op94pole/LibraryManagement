@@ -2,7 +2,7 @@
 using BusinessLogic;
 using System.Security;
 
-namespace LibraryManagement
+namespace LibraryManager
 {
     public class LibraryManagement
     {
@@ -677,23 +677,9 @@ namespace LibraryManagement
             } while (!success);
         }
 
-        public void ShowReservations(User currentUser)
+        public void ShowReservations()
         {
-            //int counter = 0;
 
-            //if (currentUser.Role == User.UserRole.Admin)
-            //{
-            //    foreach (Reservation currentReservation in logic.GetReservations())
-            //    {
-            //        counter++;
-
-            //        Console.WriteLine($"{counter}. )
-            //    }
-            //}
-            //if (currentUser.Role == User.UserRole.User)
-            //{
-
-            //}
         }
 
         public void CloseApplication()
