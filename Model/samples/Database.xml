@@ -1,0 +1,28 @@
+<Library>
+  <Users>
+    <User UserId="1" Role="Admin" Username="administrator" Password="admin1">
+    </User>
+    <User UserId="2" Role="User" Username="bob" Password="userBob">
+    </User>
+    <User UserId="3" Role="User" Username="alice" Password="userAlice">
+    </User>
+  </Users>
+  <Books>
+    <Book BookId="1" Title="Harry Potter e la pietra filosofale" AuthorName="J.K." AuthorSurname="Rowling" Publisher="Feltrinelli" Quantity="2" />
+    <Book BookId="2" Title="Harry Potter e la camera dei segreti" AuthorName="J.K." AuthorSurname="Rowling" Publisher="Feltrinelli" Quantity="3" />
+    <Book BookId="3" Title="The lord of the rings" AuthorName="J.R.R." AuthorSurname="Tolkien" Publisher="HarperCollins" Quantity="2" />
+    <Book BookId="4" Title="Eragon" AuthorName="Christopher" AuthorSurname="Paolini" Publisher="Feltrinelli" Quantity="3" />
+    <Book BookId="5" Title="Eldest" AuthorName="Christopher" AuthorSurname="Paolini" Publisher="Feltrinelli" Quantity="1" />
+  </Books>
+  <Reservations>
+    <Reservation ReservationId="1" UserId="2" BookId="5" StartDate="2024-04-05T00:00:00+02:00" EndDate="2024-04-28T00:00:00+02:00" />
+    <Reservation ReservationId="2" UserId="1" BookId="1" StartDate="2024-04-29T00:00:00+02:00" EndDate="2024-04-28T00:00:00+02:00" />
+    <Reservation ReservationId="3" UserId="1" BookId="2" StartDate="2024-04-29T00:00:00+02:00" EndDate="2024-04-28T00:00:00+02:00" />
+    <Reservation ReservationId="4" UserId="1" BookId="3" StartDate="2024-04-29T00:00:00+02:00" EndDate="2024-04-29T00:00:00+02:00" />
+    <Reservation ReservationId="5" UserId="1" BookId="5" StartDate="2024-03-28T23:00:00+01:00" EndDate="2024-04-29T00:00:00+02:00" />
+    <Reservation ReservationId="6" UserId="3" BookId="1" StartDate="2024-04-29T00:00:00+02:00" EndDate="2024-05-29T00:00:00+02:00" />
+    <Reservation ReservationId="7" UserId="3" BookId="2" StartDate="2024-04-29T00:00:00+02:00" EndDate="2024-05-29T00:00:00+02:00" />
+    <Reservation ReservationId="8" UserId="2" BookId="5" StartDate="2024-04-29T00:00:00+02:00" EndDate="2024-05-29T00:00:00+02:00" />
+    <Reservation ReservationId="9" UserId="2" BookId="1" StartDate="2024-04-29T00:00:00+02:00" EndDate="2024-04-29T00:00:00+02:00" />
+  </Reservations>
+</Library>
